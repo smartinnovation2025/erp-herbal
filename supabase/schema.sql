@@ -16,6 +16,7 @@ create table if not exists public.leads (
   suggestion             text,
   pdpa_consent           boolean not null default false,
   modules    text[] default '{}',
+  contacted_date date,
   src        text not null default 'direct' check (src in ('demo','brochure','direct')),
   status     text not null default 'new' check (status in ('new','call','sched','done','cold')),
   score      text not null default 'low' check (score in ('high','mid','low')),
