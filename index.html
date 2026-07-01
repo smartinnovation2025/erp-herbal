@@ -1652,6 +1652,40 @@ async function dbUpdateLead(id, fields) {
   return true;
 }
 
+/* ──────────────────────────────────
+   REALTIME
+────────────────────────────────── */
+function refreshAdminView() {
+  updateKPIs();
+  applyFilter();
+  updateSrcBars();
+  updateOrgBars();
+  updateInterestBars();
+  updateModulePop();
+  updateUpcomingDemos();
+  updateTrend();
+  updateVoC();
+}
+
+function subscribeRealtimeLeads() {
+  sb.channel('leads-realtime')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, (payload) => {
+      if (payload.eventType === 'INSERT') {
+        if (!leads.some(l => l.id === payload.new.id)) {
+          leads.unshift(payload.new);
+          toast('มี Lead ใหม่: ' + payload.new.name, 'info');
+        }
+      } else if (payload.eventType === 'UPDATE') {
+        const i = leads.findIndex(l => l.id === payload.new.id);
+        if (i !== -1) leads[i] = payload.new;
+      } else if (payload.eventType === 'DELETE') {
+        leads = leads.filter(l => l.id !== payload.old.id);
+      }
+      refreshAdminView();
+    })
+    .subscribe();
+}
+
 
 /* ──────────────────────────────────
    TOAST
@@ -2531,6 +2565,7 @@ function exportCSV() {
   renderCalendar();
   renderSlots();
   setInterval(updateAdminTime, 60000);
+  subscribeRealtimeLeads();
 })();
 </script>
 </body>
