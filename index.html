@@ -1117,7 +1117,7 @@ select.inp{
           <div class="ty">
             <div class="ty-ring">✓</div>
             <div class="ty-h" id="ty-h">ลงทะเบียนสำเร็จแล้ว!</div>
-            <div class="ty-p" id="ty-p">ขอบคุณครับ ทีมผู้เชี่ยวชาญจะโทรกลับ<br>เพื่อยืนยันวันและเวลา Demo ภายใน 24 ชั่วโมง</div>
+            <div class="ty-p" id="ty-p">ขอบคุณครับ ทีมผู้เชี่ยวชาญจะโทรกลับ<br>เพื่อยืนยันวันและเวลา Demo โดยเร็วที่สุด 1-3 วันทำการ</div>
             <div class="ty-acts" style="margin-top:20px">
               <button class="ty-act-btn grn" onclick="downloadBrochure()">⬇ ดาวน์โหลด Brochure ฟรี</button>
               <button class="ty-act-btn line" onclick="openLine()">💬 เพิ่ม LINE รับข่าวสาร GMP</button>
@@ -1820,11 +1820,15 @@ function resetForm() {
 }
 
 function downloadBrochure() {
-  toast('เปิดดาวน์โหลด Brochure... (เชื่อมต่อ Google Drive ในระบบจริง)','info');
+  const a = document.createElement('a');
+  a.href = 'assets/Brochure_ERP.pdf';
+  a.download = 'Brochure_ERP.pdf';
+  a.click();
+  toast('กำลังดาวน์โหลด Brochure...','ok');
 }
 
 function openLine() {
-  toast('เปิด LINE @bms-erp...(เชื่อมต่อ LINE OA ในระบบจริง)','info');
+  window.open('https://line.me/R/ti/p/@uex7247c', '_blank');
 }
 
 /* ──────────────────────────────────

@@ -26,6 +26,7 @@ create table if not exists public.leads (
 alter table public.leads enable row level security;
 
 -- Public landing-page form must be able to insert a lead with no login.
+drop policy if exists "leads_public_insert" on public.leads;
 create policy "leads_public_insert" on public.leads
   for insert to anon
   with check (true);
@@ -35,10 +36,12 @@ create policy "leads_public_insert" on public.leads
 -- can read and edit all leads, including name/phone/company. Acceptable for an
 -- internal expo-booth tool, but if this ever needs to be public-facing, add
 -- Supabase Auth and scope these two policies to an authenticated "staff" role.
+drop policy if exists "leads_public_select" on public.leads;
 create policy "leads_public_select" on public.leads
   for select to anon
   using (true);
 
+drop policy if exists "leads_public_update" on public.leads;
 create policy "leads_public_update" on public.leads
   for update to anon
   using (true)
