@@ -1,0 +1,2170 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ระบบ HERBAL ERP - งานมหกรรมสมุนไพรแห่งชาติ ครั้งที่ 23</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --g900:#052E16;--g800:#14532D;--g700:#166534;--g600:#15803D;
+  --g500:#16A34A;--g400:#22C55E;--g300:#4ADE80;--g200:#BBF7D0;
+  --g100:#DCFCE7;--g50:#F0FDF4;
+  --t700:#0F766E;--t500:#14B8A6;--t400:#2DD4BF;--t100:#CCFBF1;
+  --amb:#D97706;--ambl:#FEF3C7;
+  --red:#EF4444;--redl:#FEF2F2;
+  --ink:#111827;--ink2:#374151;--ink3:#6B7280;
+  --pale:#F9FAFB;--border:#E5E7EB;--wh:#fff;
+  --dk:#0B1A14;--dk2:#0F2018;--dk3:#162B1E;--dk4:#1E3A28;
+  --dkb:#243C2E;--dkt:#2D4F3A;
+  --dt1:#E8F5EE;--dt2:#A0C8B0;--dt3:#5A8070;--dt4:#2D4F3A;
+  --th:'Sarabun',sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+  --r4:4px;--r8:8px;--r12:12px;--r16:16px;--rfull:9999px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+body{font-family:var(--th);background:var(--pale);color:var(--ink);overflow-x:hidden}
+
+/* ── TOAST ── */
+#toasts{
+  position:fixed;bottom:20px;right:20px;z-index:9999;
+  display:flex;flex-direction:column;gap:8px;pointer-events:none;
+}
+.toast{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 16px;border-radius:var(--r12);
+  font-family:var(--th);font-size:13px;font-weight:500;
+  box-shadow:0 4px 16px rgba(0,0,0,.18);pointer-events:all;
+  animation:tIn .25s ease;min-width:220px;max-width:300px;
+}
+.toast.ok {background:#fff;border:1px solid var(--g200);color:var(--g700)}
+.toast.err{background:#fff;border:1px solid #FECACA;color:var(--red)}
+.toast.info{background:#fff;border:1px solid #BFDBFE;color:#1D4ED8}
+@keyframes tIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+@keyframes tOut{from{opacity:1}to{opacity:0;transform:translateX(16px)}}
+
+/* ── NAV ── */
+#nav{
+  position:sticky;top:0;z-index:500;height:52px;
+  background:#0B1A14;border-bottom:1px solid rgba(255,255,255,.06);
+  display:flex;align-items:center;padding:0 16px;gap:2px;
+}
+.nav-logo{
+  font-size:13px;font-weight:800;color:var(--g400);letter-spacing:.4px;
+  margin-right:14px;white-space:nowrap;line-height:1;
+}
+.nav-logo small{
+  display:block;font-size:9px;font-weight:500;
+  color:rgba(255,255,255,.28);letter-spacing:1.2px;margin-top:1px;
+}
+.nav-tab{
+  height:34px;padding:0 12px;border-radius:var(--r8);
+  background:none;border:none;cursor:pointer;
+  font-family:var(--th);font-size:12px;font-weight:500;
+  color:rgba(255,255,255,.38);transition:all .15s;white-space:nowrap;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+}
+.nav-tab:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.65)}
+.nav-tab.active{background:rgba(34,197,94,.12);color:var(--g400)}
+.nav-short{display:none}
+.nav-sp{flex:1}
+.nav-badge{
+  font-family:var(--mono);font-size:10px;
+  background:rgba(255,255,255,.04);color:rgba(255,255,255,.28);
+  padding:3px 10px;border-radius:var(--rfull);
+  border:1px solid rgba(255,255,255,.07);
+}
+
+/* ── VIEWS ── */
+.view{display:none}
+.view.active{display:block}
+
+/* ══════════════════════════════
+   LANDING
+══════════════════════════════ */
+#view-landing{font-family:var(--th)}
+
+/* ── NEW LANDING LAYOUT ── */
+.lp-wrap{
+  display:grid;grid-template-columns:minmax(390px,.92fr) minmax(520px,1.08fr);
+  min-height:calc(100vh - 52px);
+  background:#EEF3EF;position:relative;overflow:hidden;
+}
+.lp-left,.lp-right,.lp-form-box,.chk{min-width:0}
+.lp-left{
+  min-height:calc(100vh - 52px);padding:38px 40px 34px;
+  display:flex;flex-direction:column;justify-content:flex-start;gap:34px;
+  position:relative;overflow:hidden;color:#fff;isolation:isolate;
+  background:
+    linear-gradient(90deg,rgba(4,32,20,.94) 0%,rgba(6,54,31,.83) 44%,rgba(6,54,31,.28) 100%),
+    linear-gradient(0deg,rgba(3,18,13,.7),rgba(3,18,13,.08)),
+    url('assets/hero-erp-herbal.png') center/cover no-repeat;
+}
+.lp-left::before{
+  content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.1) 0 1px,transparent 1px 42px),
+    linear-gradient(45deg,rgba(255,255,255,.055) 0 1px,transparent 1px 52px);
+  opacity:.45;
+}
+.lp-left::after{
+  content:'';position:absolute;inset:auto 0 0 0;height:38%;
+  background:linear-gradient(0deg,rgba(3,18,13,.9),transparent);pointer-events:none;
+}
+.lp-brand-row{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;position:relative;z-index:1;
+}
+.lp-logo{
+  display:flex;align-items:center;gap:10px;font-size:14px;font-weight:800;
+  color:#fff;letter-spacing:.5px;line-height:1;
+}
+.lp-logo-mark{
+  width:34px;height:34px;border-radius:10px;background:rgba(34,197,94,.18);
+  border:1px solid rgba(187,247,208,.28);display:flex;align-items:center;justify-content:center;
+  color:var(--g300);box-shadow:0 12px 34px rgba(3,18,13,.32);
+}
+.lp-logo small{
+  display:block;font-size:9px;font-weight:600;color:rgba(255,255,255,.48);
+  letter-spacing:1.3px;margin-top:3px;
+}
+.lp-mini-badge{
+  font-family:var(--mono);font-size:10px;font-weight:600;color:#FDE68A;
+  background:rgba(120,53,15,.34);border:1px solid rgba(253,230,138,.28);
+  border-radius:var(--rfull);padding:6px 10px;white-space:nowrap;
+}
+.lp-hero-copy{position:relative;z-index:1;max-width:510px}
+.lp-eyebrow{
+  display:inline-flex;align-items:center;gap:7px;width:fit-content;margin-bottom:18px;
+  font-size:10px;font-weight:800;letter-spacing:1.3px;text-transform:uppercase;
+  color:#BFF7D2;background:rgba(4,32,20,.58);border:1px solid rgba(187,247,208,.18);
+  border-radius:999px;padding:7px 12px;backdrop-filter:blur(10px);
+}
+.lp-eyebrow-dot{
+  width:7px;height:7px;border-radius:50%;background:var(--g400);
+  box-shadow:0 0 0 5px rgba(34,197,94,.15);animation:blink 2s infinite;
+}
+.lp-h1{
+  font-size:clamp(31px,4.4vw,58px);font-weight:800;color:#fff;
+  line-height:1.08;margin-bottom:16px;letter-spacing:0;
+  text-shadow:0 16px 44px rgba(0,0,0,.24);
+}
+.lp-h1 em{font-style:normal;color:#A7F3D0}
+.lp-lede{
+  max-width:440px;font-size:15px;color:rgba(255,255,255,.78);
+  line-height:1.78;margin-bottom:22px;
+}
+.lp-bens{
+  list-style:none;display:grid;grid-template-columns:1fr;gap:10px;max-width:460px;
+}
+.lp-bens li{
+  display:flex;align-items:flex-start;gap:10px;
+  font-size:13.5px;color:rgba(255,255,255,.82);line-height:1.55;
+}
+.lp-check{
+  width:22px;height:22px;border-radius:8px;flex-shrink:0;
+  background:rgba(34,197,94,.18);border:1px solid rgba(187,247,208,.26);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;color:#BBF7D0;margin-top:1px;
+}
+/* Right panel */
+.lp-right{
+  background:linear-gradient(180deg,#F7FAF6 0%,#EEF3EF 100%);
+  display:flex;align-items:center;justify-content:center;
+  padding:34px 28px;overflow-y:auto;
+}
+.lp-form-box{
+  width:100%;max-width:590px;background:rgba(255,255,255,.9);
+  border:1px solid rgba(20,83,45,.12);border-radius:22px;
+  box-shadow:0 28px 70px rgba(15,35,25,.13),0 2px 10px rgba(15,35,25,.05);
+  padding:26px;backdrop-filter:blur(18px);
+}
+.lp-form-top{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:18px;
+}
+.lp-form-kicker{
+  display:inline-flex;align-items:center;gap:8px;border-radius:999px;
+  padding:6px 11px;background:#ECFDF5;border:1px solid var(--g200);
+  color:var(--g700);font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;
+}
+.lp-form-kicker::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--g500)}
+.lp-time-pill{
+  font-family:var(--mono);font-size:10px;color:#92400E;background:#FFFBEB;
+  border:1px solid #FDE68A;border-radius:999px;padding:6px 9px;white-space:nowrap;
+}
+.lp-form-h{
+  font-size:25px;font-weight:800;color:#0C1F16;line-height:1.22;margin-bottom:7px;letter-spacing:0;
+}
+.lp-form-sub{font-size:13px;color:var(--ink3);margin-bottom:20px;line-height:1.65}
+.lp-form-sub strong{color:var(--g700);font-weight:800}
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.lp-note{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  font-size:11.5px;color:var(--ink3);text-align:center;margin-top:13px;line-height:1.5;
+}
+.lp-note::before{
+  content:'';width:8px;height:8px;border-radius:3px;background:linear-gradient(135deg,var(--g400),#F59E0B);
+}
+
+/* Responsive */
+@media(max-width:980px){
+  .lp-wrap{grid-template-columns:1fr}
+  .lp-left{min-height:auto;padding:28px 22px 24px;gap:26px}
+  .lp-h1{font-size:clamp(27px,8vw,42px)}
+  .lp-right{padding:20px 16px 28px}
+  .lp-form-box{max-width:680px}
+}
+@media(max-width:620px){
+  #nav{height:auto;min-height:52px;display:grid;grid-template-columns:1fr 1fr;padding:8px 10px}
+  .nav-logo{grid-column:1/-1;margin:0 0 6px}
+  .nav-sp,.nav-badge{display:none}
+  .nav-tab{width:100%;min-width:0;padding:0 8px;font-size:11px}
+  .nav-full{display:none}
+  .nav-short{display:inline}
+  .lp-left{padding:22px 16px}
+  .lp-brand-row{align-items:flex-start}
+  .lp-mini-badge{display:none}
+  .lp-lede,.lp-bens{display:none}
+  .lp-form-box{padding:18px;border-radius:18px}
+  .lp-form-top{flex-direction:column;gap:8px}
+  .field-grid,.checks{grid-template-columns:1fr}
+  .lp-form-h{font-size:21px}
+}
+
+.hero{
+  background:linear-gradient(155deg,var(--g900) 0%,var(--g800) 55%,#0F4F30 100%);
+  padding:52px 20px 44px;text-align:center;position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(circle at 15% 75%,rgba(34,197,94,.14) 0%,transparent 50%),
+    radial-gradient(circle at 85% 20%,rgba(45,212,191,.09) 0%,transparent 50%);
+}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:var(--g300);background:rgba(34,197,94,.1);
+  padding:5px 14px;border-radius:var(--rfull);
+  border:1px solid rgba(34,197,94,.22);margin-bottom:20px;position:relative;
+}
+.eyebrow-dot{
+  width:6px;height:6px;border-radius:50%;background:var(--g400);
+  animation:blink 2s infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.hero-h1{
+  font-size:clamp(28px,6vw,42px);font-weight:800;color:#fff;
+  line-height:1.15;margin-bottom:14px;position:relative;
+}
+.hero-h1 em{
+  font-style:normal;
+  background:linear-gradient(135deg,var(--g300) 0%,var(--t400) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.hero-sub{
+  font-size:15px;color:rgba(255,255,255,.62);line-height:1.72;
+  max-width:430px;margin:0 auto 28px;position:relative;
+}
+.hero-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;position:relative}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--th);font-size:14px;font-weight:700;
+  padding:13px 22px;border-radius:var(--r12);border:none;cursor:pointer;
+  transition:all .18s;text-decoration:none;
+}
+.btn-green{
+  background:var(--g400);color:var(--g900);
+  box-shadow:0 2px 14px rgba(34,197,94,.35);
+}
+.btn-green:hover{background:#34D368;transform:translateY(-1px);box-shadow:0 4px 20px rgba(34,197,94,.45)}
+.btn-outline{
+  background:rgba(255,255,255,.08);color:#fff;
+  border:1.5px solid rgba(255,255,255,.2);
+}
+.btn-outline:hover{background:rgba(255,255,255,.14)}
+
+/* Trust bar */
+.trust-bar{
+  background:var(--g800);padding:11px 20px;
+  display:flex;justify-content:center;align-items:center;
+  gap:22px;flex-wrap:wrap;border-bottom:1px solid rgba(34,197,94,.1);
+}
+.trust-item{
+  display:flex;align-items:center;gap:6px;
+  font-size:12px;font-weight:500;color:var(--g200);
+}
+.trust-dot{width:5px;height:5px;border-radius:50%;background:var(--g400);flex-shrink:0}
+
+/* Section */
+.sec{padding:40px 20px;max-width:680px;margin:0 auto}
+.sec-label{
+  font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--g600);margin-bottom:7px;
+}
+.sec-h2{font-size:24px;font-weight:800;color:var(--ink);line-height:1.3;margin-bottom:22px}
+.divider{height:1px;background:var(--border);margin:0 20px}
+
+/* Pain cards */
+.pain-grid{display:flex;flex-direction:column;gap:10px}
+.pain-card{
+  background:var(--wh);border:1px solid var(--border);border-radius:var(--r12);
+  padding:16px;display:flex;align-items:flex-start;gap:14px;
+  transition:box-shadow .15s,transform .15s;
+}
+.pain-card:hover{box-shadow:0 4px 14px rgba(0,0,0,.07);transform:translateY(-1px)}
+.pain-icon{
+  width:40px;height:40px;border-radius:var(--r8);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;background:var(--redl);
+}
+.pain-title{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.pain-desc{font-size:12px;color:var(--ink3);line-height:1.6}
+
+/* Feature grid */
+.feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.feat-card{
+  background:var(--wh);border:1px solid var(--border);border-radius:var(--r12);
+  padding:18px 16px;transition:all .15s;
+}
+.feat-card:hover{border-color:var(--g300);box-shadow:0 4px 14px rgba(34,197,94,.1)}
+.feat-icon{
+  width:42px;height:42px;border-radius:var(--r12);
+  background:var(--g100);display:flex;align-items:center;justify-content:center;
+  font-size:20px;margin-bottom:12px;
+}
+.feat-title{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:5px}
+.feat-desc{font-size:12px;color:var(--ink3);line-height:1.55}
+
+/* Social proof */
+.proof-row{
+  display:flex;gap:12px;align-items:stretch;
+  overflow-x:auto;padding-bottom:4px;
+}
+.proof-card{
+  background:var(--wh);border:1px solid var(--border);border-radius:var(--r12);
+  padding:16px;min-width:200px;flex-shrink:0;
+}
+.proof-stars{color:#F59E0B;font-size:13px;margin-bottom:8px}
+.proof-text{font-size:12px;color:var(--ink2);line-height:1.6;margin-bottom:10px;font-style:italic}
+.proof-author{font-size:11px;font-weight:700;color:var(--ink3)}
+
+/* Form */
+.form-card{
+  background:var(--wh);border:1px solid var(--border);border-radius:var(--r16);
+  overflow:hidden;box-shadow:0 2px 24px rgba(0,0,0,.07);
+}
+.form-hd{
+  background:linear-gradient(135deg,var(--g800),var(--g700));
+  padding:22px 24px;
+}
+.form-hd-title{font-size:18px;font-weight:800;color:#fff;margin-bottom:4px}
+.form-hd-sub{font-size:12px;color:var(--g200);display:flex;align-items:center;gap:6px}
+.form-hd-dot{width:6px;height:6px;border-radius:50%;background:var(--g400)}
+
+/* Form type switcher */
+.type-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px}
+.type-btn{
+  padding:10px 8px;border-radius:var(--r8);border:2px solid var(--border);
+  background:var(--pale);cursor:pointer;text-align:center;
+  transition:all .15s;font-family:var(--th);
+}
+.type-btn.on{border-color:var(--g500);background:var(--g50)}
+.type-btn-icon{font-size:20px;display:block;margin-bottom:3px}
+.type-btn-label{font-size:11px;font-weight:700;color:var(--ink2)}
+.type-btn.on .type-btn-label{color:var(--g700)}
+
+.form-body{padding:22px 24px}
+.fld{margin-bottom:14px}
+.fld label{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:#1F3529;margin-bottom:6px}
+.fld label small{font-size:11px;font-weight:500;color:var(--ink3)}
+.fld .req{color:var(--red);margin-left:2px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.org-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.org-btn{
+  padding:12px 8px;border-radius:12px;border:1.5px solid #DDE7DF;
+  background:#F8FAF8;cursor:pointer;text-align:center;transition:all .15s;font-family:var(--th);
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+}
+.org-btn:hover{border-color:var(--g300);transform:translateY(-1px)}
+.org-btn.on{border-color:var(--g500);background:var(--g50);box-shadow:0 8px 20px rgba(34,197,94,.14)}
+.org-btn-icon{font-size:20px;line-height:1}
+.org-btn-label{font-size:11.5px;font-weight:700;color:var(--ink2)}
+.org-btn.on .org-btn-label{color:var(--g700)}
+.cal-box{background:#F8FAF8;border:1.5px solid #DDE7DF;border-radius:14px;padding:10px 12px}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.cal-nav{
+  width:22px;height:22px;border-radius:6px;border:1px solid #DDE7DF;background:#fff;
+  cursor:pointer;font-size:12px;color:var(--ink2);display:flex;align-items:center;justify-content:center;
+  transition:all .15s;
+}
+.cal-nav:hover{border-color:var(--g400);color:var(--g700)}
+.cal-nav:disabled{opacity:.3;cursor:not-allowed}
+.cal-month{font-size:11.5px;font-weight:800;color:var(--ink)}
+.cal-dow{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;margin-bottom:2px}
+.cal-dow span{font-size:9px;font-weight:700;color:var(--ink3)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal-day{
+  height:26px;display:flex;align-items:center;justify-content:center;border-radius:6px;
+  font-size:10.5px;font-weight:600;color:var(--ink2);cursor:pointer;background:#fff;border:1px solid transparent;
+  transition:all .12s;
+}
+.cal-day:hover:not(.disabled):not(.empty){border-color:var(--g400);color:var(--g700)}
+.cal-day.on{background:var(--g500);color:#fff}
+.cal-day.today:not(.on){border-color:var(--g400);color:var(--g700)}
+.cal-day.disabled{color:#C4CDC7;cursor:not-allowed;background:transparent}
+.cal-day.empty{visibility:hidden;cursor:default}
+.slot-row{display:none;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
+.slot-row.show{display:grid}
+.slot-btn{
+  height:36px;border-radius:9px;border:1.5px solid #DDE7DF;background:#fff;
+  font-family:var(--th);font-size:12px;font-weight:700;color:var(--ink2);cursor:pointer;transition:all .15s;
+}
+.slot-btn:hover:not(.taken){border-color:var(--g400);color:var(--g700)}
+.slot-btn.on{border-color:var(--g500);background:var(--g50);color:var(--g700)}
+.slot-btn.taken{background:#F3F4F6;color:#C4CDC7;cursor:not-allowed;text-decoration:line-through;border-color:#E5E7EB}
+.inp{
+  width:100%;height:46px;background:#F8FAF8;border:1.5px solid #DDE7DF;border-radius:12px;
+  font-family:var(--th);font-size:14px;color:var(--ink);
+  padding:0 14px;transition:border-color .15s,box-shadow .15s,background .15s;
+}
+.inp::placeholder{color:#98A49B}
+.inp:hover{border-color:#C9D8CD}
+.inp:focus{outline:none;border-color:var(--g500);background:#fff;box-shadow:0 0 0 4px rgba(34,197,94,.13)}
+.inp.bad{border-color:var(--red);background:var(--redl)}
+.inp.bad:focus{box-shadow:0 0 0 4px rgba(239,68,68,.11)}
+.ferr{font-size:11px;color:var(--red);margin-top:4px;display:none}
+.ferr.on{display:block}
+select.inp{
+  cursor:pointer;appearance:none;
+  background-image:linear-gradient(45deg,transparent 50%,#667085 50%),linear-gradient(135deg,#667085 50%,transparent 50%);
+  background-position:calc(100% - 18px) 19px,calc(100% - 13px) 19px;
+  background-size:5px 5px,5px 5px;background-repeat:no-repeat;
+}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:2px 0}
+.chk{
+  display:flex;align-items:flex-start;gap:8px;cursor:pointer;
+  padding:9px 11px;border:1.5px solid #DDE7DF;border-radius:10px;background:#FBFDFB;
+  transition:border-color .15s,box-shadow .15s,background .15s;
+}
+.chk:hover{border-color:var(--g300)}
+.chk input[type=checkbox]{width:15px;height:15px;margin-top:1px;accent-color:var(--g600);cursor:pointer;flex-shrink:0}
+.chk span{font-size:11.5px;color:#24362C;font-weight:600;line-height:1.4}
+.chk:has(input:checked){border-color:var(--g500);background:#ECFDF5}
+
+.mod-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
+.mod-chip{
+  display:flex;align-items:center;gap:8px;cursor:pointer;
+  padding:9px 11px;border:1.5px solid #DDE7DF;border-radius:10px;background:#FBFDFB;
+  transition:border-color .15s,box-shadow .15s,background .15s;
+}
+.mod-chip:hover{border-color:var(--g300)}
+.mod-chip input[type=checkbox]{width:15px;height:15px;accent-color:var(--g600);cursor:pointer;flex-shrink:0}
+.mod-chip span{font-size:12.5px;color:#24362C;font-weight:600;line-height:1.3}
+.mod-chip:has(input:checked){border-color:var(--g500);background:#ECFDF5}
+.mod-chip.mod-all{margin-bottom:8px;background:var(--g50);border-color:var(--g200)}
+.mod-chip.mod-all span{font-weight:800;color:var(--g700)}
+
+.int-row{display:flex;flex-direction:column;gap:10px}
+.int-opt{
+  display:flex;align-items:flex-start;gap:12px;cursor:pointer;
+  padding:13px 15px;border:1.5px solid #DDE7DF;border-radius:14px;background:#FBFDFB;
+  transition:border-color .15s,box-shadow .15s,transform .15s,background .15s;
+}
+.int-opt:hover{border-color:var(--g300);transform:translateY(-1px);box-shadow:0 12px 24px rgba(20,83,45,.08)}
+.int-opt input[type=radio]{width:18px;height:18px;margin-top:2px;accent-color:var(--g600);cursor:pointer;flex-shrink:0}
+.int-opt-title{font-size:12.5px;font-weight:700;color:#1F3529;line-height:1.4}
+.int-opt-sub{font-size:11px;color:var(--ink3);margin-top:3px;line-height:1.5}
+.int-opt:has(input:checked){border-color:var(--g500);background:#ECFDF5;box-shadow:0 12px 26px rgba(34,197,94,.12)}
+
+.txt-area{
+  width:100%;min-height:84px;background:#F8FAF8;border:1.5px solid #DDE7DF;border-radius:12px;
+  font-family:var(--th);font-size:14px;color:var(--ink);padding:12px 14px;resize:vertical;
+  transition:border-color .15s,box-shadow .15s,background .15s;
+}
+.txt-area::placeholder{color:#98A49B}
+.txt-area:focus{outline:none;border-color:var(--g500);background:#fff;box-shadow:0 0 0 4px rgba(34,197,94,.13)}
+
+.sub-btn{
+  width:100%;min-height:52px;margin-top:8px;
+  background:linear-gradient(135deg,#15803D 0%,#0F766E 100%);
+  color:#fff;font-family:var(--th);font-size:15px;font-weight:800;
+  border:none;border-radius:14px;cursor:pointer;
+  transition:transform .18s,box-shadow .18s,filter .18s;
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  box-shadow:0 16px 34px rgba(15,118,110,.24);
+}
+.sub-btn:hover{filter:saturate(1.08);transform:translateY(-1px);box-shadow:0 20px 38px rgba(15,118,110,.3)}
+.sub-btn.loading{opacity:.65;cursor:not-allowed;pointer-events:none}
+.form-note{font-size:11px;color:var(--ink3);text-align:center;margin-top:10px}
+
+/* Thank you */
+.ty{text-align:center;padding:30px 18px 12px;animation:fadeUp .4s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.ty-ring{
+  width:78px;height:78px;border-radius:22px;
+  background:linear-gradient(135deg,#DCFCE7,#CCFBF1);border:1px solid var(--g200);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 18px;font-size:30px;color:var(--g800);
+  box-shadow:0 18px 38px rgba(34,197,94,.18);
+}
+.ty-h{font-size:24px;font-weight:800;color:#0C1F16;margin-bottom:9px}
+.ty-p{font-size:14px;color:var(--ink3);line-height:1.75;margin-bottom:22px}
+.ty-gift{
+  background:var(--g50);border:1px solid var(--g200);border-radius:var(--r12);
+  padding:16px;margin-bottom:16px;text-align:left;
+}
+.ty-gift-title{font-size:12px;font-weight:700;color:var(--g700);margin-bottom:10px}
+.ty-gift-item{
+  background:var(--wh);border:1px solid var(--border);border-radius:var(--r8);
+  padding:12px;display:flex;align-items:center;gap:12px;margin-bottom:10px;
+}
+.ty-gift-icon{font-size:24px;flex-shrink:0}
+.ty-gift-name{font-size:13px;font-weight:600;color:var(--ink)}
+.ty-gift-sub{font-size:11px;color:var(--ink3)}
+.ty-acts{display:flex;flex-direction:column;gap:9px}
+.ty-act-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  min-height:48px;padding:13px 20px;border-radius:14px;border:none;cursor:pointer;
+  font-family:var(--th);font-size:14px;font-weight:800;transition:all .15s;
+}
+.ty-act-btn.grn{background:linear-gradient(135deg,#15803D,#0F766E);color:#fff;box-shadow:0 14px 28px rgba(15,118,110,.2)}
+.ty-act-btn.grn:hover{filter:saturate(1.08);transform:translateY(-1px)}
+.ty-act-btn.line{background:#06C755;color:#fff}
+.ty-act-btn.line:hover{background:#00B04A;transform:translateY(-1px)}
+.ty-act-btn.ghost{background:#F8FAF8;color:var(--ink2);border:1px solid #DDE7DF}
+
+/* ══════════════════════════════
+   ADMIN DASHBOARD
+══════════════════════════════ */
+#view-admin{min-height:calc(100vh - 52px);background:var(--dk);font-family:var(--th);color:var(--dt1)}
+.adm{max-width:1160px;margin:0 auto;padding:24px 20px 48px}
+
+.adm-top{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  margin-bottom:24px;flex-wrap:wrap;gap:12px;
+}
+.adm-title{font-size:20px;font-weight:800;color:#fff}
+.adm-title span{font-size:12px;font-weight:400;color:var(--dt3);margin-left:10px}
+.adm-sub{font-size:12px;color:var(--dt4);margin-top:4px}
+.adm-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.adm-search{
+  height:34px;background:var(--dk3);border:1px solid var(--dkb);
+  border-radius:var(--r8);padding:0 12px;color:var(--dt2);
+  font-family:var(--th);font-size:12px;width:180px;
+}
+.adm-search:focus{outline:none;border-color:var(--g500)}
+.adm-select{
+  height:34px;background:var(--dk3);border:1px solid var(--dkb);
+  border-radius:var(--r8);padding:0 10px;color:var(--dt2);
+  font-family:var(--th);font-size:12px;cursor:pointer;
+}
+.adm-btn{
+  height:34px;padding:0 14px;border-radius:var(--r8);border:none;
+  font-family:var(--th);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;
+}
+.adm-btn.g{background:var(--g400);color:var(--g900)}
+.adm-btn.g:hover{background:var(--g300)}
+.adm-btn.ghost{background:var(--dk3);color:var(--dt2);border:1px solid var(--dkb)}
+.adm-btn.ghost:hover{background:var(--dk4)}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.kpi{
+  background:var(--dk2);border:1px solid var(--dkb);border-radius:var(--r16);
+  padding:18px;position:relative;overflow:hidden;
+}
+.kpi::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:3px;
+}
+.kpi.k1::after{background:linear-gradient(90deg,var(--g400),var(--t400))}
+.kpi.k2::after{background:linear-gradient(90deg,#818CF8,#A78BFA)}
+.kpi.k3::after{background:linear-gradient(90deg,var(--amb),#FBBF24)}
+.kpi.k4::after{background:linear-gradient(90deg,var(--t400),#38BDF8)}
+.kpi-lbl{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--dt3);margin-bottom:10px}
+.kpi-val{font-size:32px;font-weight:800;color:#fff;line-height:1;margin-bottom:8px}
+.kpi-delta{
+  display:inline-flex;align-items:center;gap:3px;
+  font-size:11px;font-family:var(--mono);padding:2px 8px;border-radius:var(--rfull);
+}
+.delta-up{background:rgba(34,197,94,.15);color:var(--g400)}
+.delta-dn{background:rgba(239,68,68,.12);color:var(--red)}
+.kpi-sub{font-size:10px;color:var(--dt4);margin-top:5px}
+
+/* Panel */
+.panel{background:var(--dk2);border:1px solid var(--dkb);border-radius:var(--r16);padding:20px}
+.panel-title{
+  font-size:13px;font-weight:700;color:var(--dt1);
+  margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;
+}
+.ptag{font-size:10px;font-weight:600;padding:2px 8px;border-radius:var(--rfull)}
+.ptag-g{background:rgba(34,197,94,.12);color:var(--g400)}
+.ptag-gold{background:rgba(217,119,6,.15);color:#FBBF24}
+.ptag-v{background:rgba(139,92,246,.15);color:#A78BFA}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.g31{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px}
+
+/* Funnel */
+.funnel{display:flex;flex-direction:column;gap:6px}
+.f-row{display:flex;align-items:center;gap:10px}
+.f-lbl{font-size:11px;color:var(--dt3);min-width:70px}
+.f-track{flex:1;height:30px;background:var(--dk3);border-radius:var(--r4);overflow:hidden}
+.f-bar{
+  height:100%;border-radius:var(--r4);
+  display:flex;align-items:center;padding:0 10px;
+  transition:width .8s cubic-bezier(.4,0,.2,1);
+}
+.f-bar-txt{font-size:11px;font-weight:600;color:#fff;white-space:nowrap}
+.f-cnt{font-size:12px;font-weight:700;color:var(--dt1);min-width:28px;text-align:right;font-family:var(--mono)}
+.f-pct{font-size:10px;color:var(--dt4);min-width:30px;font-family:var(--mono)}
+.f-drop{font-size:10px;color:var(--red);margin-left:80px;margin-bottom:2px;font-family:var(--mono)}
+
+/* Source */
+.src-list{display:flex;flex-direction:column;gap:10px}
+.src-item{display:flex;flex-direction:column;gap:4px}
+.src-meta{display:flex;justify-content:space-between}
+.src-name{font-size:11px;color:var(--dt2)}
+.src-val{font-size:12px;font-weight:700;color:var(--dt1);font-family:var(--mono)}
+.src-track{background:var(--dk3);border-radius:var(--r4);height:8px;overflow:hidden}
+.src-fill{height:100%;border-radius:var(--r4)}
+
+/* Upcoming demo bookings */
+.upc-item{
+  display:flex;align-items:center;gap:10px;padding:8px 10px;
+  border-radius:var(--r8);background:var(--dk3);cursor:pointer;transition:background .12s;
+}
+.upc-item:hover{background:var(--dk4)}
+.upc-date{font-family:var(--mono);font-size:11px;color:var(--g400);min-width:72px;line-height:1.5}
+.upc-date span{display:block;font-size:10px;color:var(--dt3)}
+.upc-name{font-size:12px;font-weight:600;color:var(--dt1)}
+.upc-co{font-size:10px;color:var(--dt4);margin-top:1px}
+.upc-empty{font-size:11px;color:var(--dt4);text-align:center;padding:14px 0}
+
+/* Trend */
+.legend{display:flex;gap:12px;margin-bottom:10px}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--dt3)}
+.ldot{width:8px;height:8px;border-radius:2px}
+.trend-list{display:flex;flex-direction:column;gap:6px}
+.t-row{display:flex;align-items:center;gap:8px}
+.t-day{font-size:10px;color:var(--dt4);min-width:36px;font-family:var(--mono)}
+.t-track{flex:1;height:20px;background:var(--dk3);border-radius:var(--r4);overflow:hidden}
+.t-bar{
+  height:100%;border-radius:var(--r4);
+  display:flex;align-items:center;justify-content:flex-end;padding-right:6px;
+  transition:width .6s ease;
+}
+.t-num{font-size:10px;color:rgba(255,255,255,.55);font-family:var(--mono)}
+.t-total{font-size:10px;color:var(--dt4);min-width:20px;text-align:right;font-family:var(--mono)}
+
+/* Lead table */
+.tbl-wrap{overflow-x:auto}
+.tbl{width:100%;border-collapse:collapse;font-size:12px;white-space:nowrap}
+.tbl th{
+  text-align:left;padding:7px 10px;
+  font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;
+  color:var(--dt4);border-bottom:1px solid var(--dkb);
+}
+.tbl td{
+  padding:10px 10px;border-bottom:1px solid rgba(255,255,255,.03);
+  color:var(--dt2);vertical-align:middle;
+}
+.tbl tr:hover td{background:rgba(34,197,94,.04);cursor:pointer}
+.td-name{font-weight:600;color:var(--dt1)!important}
+.td-co{font-size:11px;color:var(--dt4)!important}
+
+/* Pills */
+.pill{
+  display:inline-flex;align-items:center;
+  font-size:10px;font-weight:700;padding:3px 8px;border-radius:var(--rfull);
+  font-family:var(--mono);white-space:nowrap;
+}
+.pill-high{background:rgba(34,197,94,.18);color:var(--g300)}
+.pill-mid{background:rgba(217,119,6,.15);color:#FBBF24}
+.pill-low{background:rgba(107,114,128,.15);color:#9CA3AF}
+
+.stt{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:var(--rfull)}
+.stt-new{background:rgba(45,212,191,.15);color:var(--t400)}
+.stt-call{background:rgba(217,119,6,.15);color:#FBBF24}
+.stt-sched{background:rgba(34,197,94,.15);color:var(--g400)}
+.stt-done{background:rgba(34,197,94,.2);color:var(--g300)}
+.stt-cold{background:rgba(107,114,128,.12);color:#6B7280}
+
+.srcp{font-size:10px;font-weight:600;padding:2px 7px;border-radius:var(--r4)}
+.srcp-demo{background:rgba(34,197,94,.12);color:var(--g400)}
+.srcp-brochure{background:rgba(139,92,246,.15);color:#A78BFA}
+.srcp-direct{background:rgba(255,255,255,.07);color:var(--dt3)}
+.srcp-custom{background:rgba(56,189,248,.12);color:#38BDF8}
+
+.row-btn{
+  background:var(--dk3);border:1px solid var(--dkb);border-radius:var(--r4);
+  color:var(--dt3);font-size:10px;font-weight:500;padding:3px 8px;
+  cursor:pointer;font-family:var(--th);transition:all .12s;
+}
+.row-btn:hover{background:var(--dk4);color:var(--dt2)}
+.row-btn.call{border-color:rgba(34,197,94,.3);color:var(--g400)}
+.row-btn.call:hover{background:rgba(34,197,94,.1)}
+
+/* Insights */
+.ins-list{display:flex;flex-direction:column;gap:10px}
+.ins{
+  background:var(--dk3);border-radius:var(--r8);padding:12px 14px;
+  border-left:3px solid transparent;
+}
+.ins.warn{border-color:var(--amb)}
+.ins.good{border-color:var(--g400)}
+.ins.info{border-color:#818CF8}
+.ins-title{font-size:12px;font-weight:700;color:var(--dt1);margin-bottom:3px}
+.ins-body{font-size:11px;color:var(--dt3);line-height:1.55}
+.ins-act{font-size:11px;color:var(--t400);margin-top:5px;cursor:pointer;display:inline-block}
+.ins-act:hover{text-decoration:underline}
+
+/* Drawer */
+#drawer{
+  position:fixed;top:52px;right:-400px;bottom:0;width:380px;
+  background:var(--dk2);border-left:1px solid var(--dkb);
+  z-index:400;transition:right .3s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+#drawer.open{right:0}
+#drawer-overlay{
+  position:fixed;inset:0;top:52px;background:rgba(0,0,0,.4);
+  z-index:399;display:none;
+}
+#drawer-overlay.on{display:block}
+.drw-head{
+  padding:18px 20px;border-bottom:1px solid var(--dkb);
+  display:flex;align-items:flex-start;justify-content:space-between;
+}
+.drw-close{
+  background:var(--dk3);border:1px solid var(--dkb);border-radius:var(--r4);
+  color:var(--dt3);width:28px;height:28px;font-size:16px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:color .12s;
+}
+.drw-close:hover{color:var(--dt1)}
+.drw-name{font-size:18px;font-weight:800;color:#fff}
+.drw-co{font-size:12px;color:var(--dt3);margin-top:2px}
+.drw-body{flex:1;overflow-y:auto;padding:20px}
+.drw-sec{margin-bottom:20px}
+.drw-sec-title{
+  font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  color:var(--dt4);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--dkb);
+}
+.drw-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px}
+.drw-field label{font-size:10px;color:var(--dt4);display:block;margin-bottom:2px}
+.drw-field span{font-size:13px;color:var(--dt1)}
+.st-btns{display:flex;flex-wrap:wrap;gap:6px}
+.st-btn{
+  padding:5px 12px;border-radius:var(--rfull);border:1.5px solid var(--dkb);
+  font-family:var(--th);font-size:11px;font-weight:600;cursor:pointer;
+  background:var(--dk3);color:var(--dt3);transition:all .12s;
+}
+.st-btn:hover{border-color:var(--g400);color:var(--g400)}
+.st-btn.on{border-color:var(--g400);background:rgba(34,197,94,.1);color:var(--g400)}
+.note-area{
+  width:100%;height:72px;background:var(--dk3);border:1px solid var(--dkb);
+  border-radius:var(--r8);color:var(--dt1);font-family:var(--th);font-size:12px;
+  padding:8px 12px;resize:none;
+}
+.note-area:focus{outline:none;border-color:var(--g500)}
+.save-lead-btn{
+  width:100%;height:38px;background:var(--g600);color:#fff;
+  font-family:var(--th);font-size:13px;font-weight:700;
+  border:none;border-radius:var(--r8);cursor:pointer;margin-top:8px;transition:background .15s;
+}
+.save-lead-btn:hover{background:var(--g500)}
+
+/* Add Lead Modal */
+#modal{
+  position:fixed;inset:0;z-index:600;
+  display:none;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.6);backdrop-filter:blur(4px);
+}
+#modal.open{display:flex}
+.modal-card{
+  background:var(--dk2);border:1px solid var(--dkb);border-radius:var(--r16);
+  padding:24px;width:92%;max-width:440px;max-height:90vh;overflow-y:auto;
+}
+.modal-title{font-size:16px;font-weight:800;color:#fff;margin-bottom:18px}
+.mfld{margin-bottom:12px}
+.mfld label{display:block;font-size:11px;font-weight:600;color:var(--dt3);margin-bottom:4px}
+.minp{
+  width:100%;height:38px;background:var(--dk3);border:1px solid var(--dkb);
+  border-radius:var(--r8);color:var(--dt1);font-family:var(--th);font-size:13px;padding:0 12px;
+}
+.minp:focus{outline:none;border-color:var(--g500)}
+.mfrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.modal-acts{display:flex;gap:8px;margin-top:16px}
+.modal-ok{
+  flex:1;height:40px;background:var(--g600);color:#fff;
+  font-family:var(--th);font-size:13px;font-weight:700;
+  border:none;border-radius:var(--r8);cursor:pointer;transition:background .15s;
+}
+.modal-ok:hover{background:var(--g500)}
+.modal-cancel{
+  height:40px;padding:0 16px;background:var(--dk3);color:var(--dt2);
+  border:1px solid var(--dkb);font-family:var(--th);font-size:13px;
+  border-radius:var(--r8);cursor:pointer;
+}
+
+/* ══════════════════════════════
+   QR GENERATOR
+══════════════════════════════ */
+#view-qr{min-height:calc(100vh - 52px);background:var(--dk);font-family:var(--th);color:var(--dt1)}
+.qr-wrap{max-width:900px;margin:0 auto;padding:24px 20px 48px}
+.qr-top{margin-bottom:24px}
+.qr-title{font-size:20px;font-weight:800;color:#fff;margin-bottom:4px}
+.qr-sub{font-size:12px;color:var(--dt3)}
+
+.qr-main{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start}
+.qr-builder{background:var(--dk2);border:1px solid var(--dkb);border-radius:var(--r16);padding:22px}
+.qr-preview-panel{
+  background:var(--dk2);border:1px solid var(--dkb);border-radius:var(--r16);padding:22px;
+  display:flex;flex-direction:column;align-items:center;position:sticky;top:72px;
+}
+.qr-preview-lbl{font-size:11px;font-weight:700;color:var(--dt3);align-self:flex-start;margin-bottom:16px}
+.qr-canvas{
+  width:200px;height:200px;background:#fff;border-radius:var(--r12);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:14px;overflow:hidden;
+}
+#qr-out{width:180px;height:180px;display:flex;align-items:center;justify-content:center}
+#qr-out img,#qr-out canvas{width:180px!important;height:180px!important}
+.qr-url-preview{
+  font-size:9px;color:var(--dt4);text-align:center;margin-bottom:16px;
+  max-width:200px;word-break:break-all;font-family:var(--mono);line-height:1.5;
+}
+.qr-dl{
+  width:200px;height:40px;background:var(--g600);color:#fff;
+  font-family:var(--th);font-size:13px;font-weight:700;
+  border:none;border-radius:var(--r8);cursor:pointer;margin-bottom:8px;transition:background .15s;
+}
+.qr-dl:hover{background:var(--g500)}
+.qr-dl:disabled{opacity:.3;cursor:not-allowed}
+.qr-print{
+  width:200px;height:36px;background:var(--dk3);color:var(--dt2);
+  border:1px solid var(--dkb);font-family:var(--th);font-size:12px;
+  border-radius:var(--r8);cursor:pointer;transition:all .15s;
+}
+.qr-print:hover{background:var(--dk4)}
+
+.qf{margin-bottom:16px}
+.qf label{display:block;font-size:11px;font-weight:600;color:var(--dt3);margin-bottom:5px}
+.qinp{
+  width:100%;height:38px;background:var(--dk3);border:1px solid var(--dkb);
+  border-radius:var(--r8);color:var(--dt1);font-family:var(--th);font-size:13px;
+  padding:0 12px;transition:border-color .15s;
+}
+.qinp:focus{outline:none;border-color:var(--g500)}
+.qtype-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.qtype-btn{
+  padding:10px 8px;border-radius:var(--r8);border:2px solid var(--dkb);
+  background:var(--dk3);cursor:pointer;text-align:center;transition:all .15s;font-family:var(--th);
+}
+.qtype-btn.on{border-color:var(--g500);background:rgba(34,197,94,.08)}
+.qtype-btn-icon{font-size:18px;display:block;margin-bottom:3px}
+.qtype-btn-label{font-size:11px;font-weight:600;color:var(--dt3)}
+.qtype-btn.on .qtype-btn-label{color:var(--g400)}
+.qgen-btn{
+  width:100%;height:44px;background:linear-gradient(135deg,var(--g600),var(--g700));
+  color:#fff;font-family:var(--th);font-size:14px;font-weight:700;
+  border:none;border-radius:var(--r12);cursor:pointer;margin-top:8px;transition:all .18s;
+}
+.qgen-btn:hover{background:linear-gradient(135deg,var(--g500),var(--g600));transform:translateY(-1px)}
+
+/* QR History */
+.qr-hist{margin-top:20px}
+.qr-hist-title{font-size:13px;font-weight:700;color:var(--dt1);margin-bottom:14px}
+.qr-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.qr-tbl th{
+  text-align:left;padding:7px 10px;font-size:10px;font-weight:600;
+  letter-spacing:.5px;text-transform:uppercase;color:var(--dt4);
+  border-bottom:1px solid var(--dkb);
+}
+.qr-tbl td{
+  padding:10px 10px;border-bottom:1px solid rgba(255,255,255,.03);
+  color:var(--dt2);
+}
+.live-dot{
+  display:inline-block;width:6px;height:6px;border-radius:50%;
+  background:var(--g400);box-shadow:0 0 5px var(--g400);margin-right:5px;
+}
+.off-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--dt4);margin-right:5px}
+.qr-toggle{
+  background:none;border:1px solid var(--dkb);border-radius:var(--r4);
+  color:var(--dt3);font-size:10px;font-family:var(--th);padding:2px 8px;cursor:pointer;
+}
+.qr-toggle:hover{border-color:var(--g400);color:var(--g400)}
+
+/* Responsive */
+@media(max-width:900px){.qr-main{grid-template-columns:1fr}}
+@media(max-width:768px){
+  .kpi-grid{grid-template-columns:1fr 1fr}
+  .g2,.g31{grid-template-columns:1fr}
+  .feat-grid{grid-template-columns:1fr}
+  .frow,.field-grid{grid-template-columns:1fr}
+  #drawer{width:100%;right:-100%}
+  #drawer.open{right:0}
+  .mfrow{grid-template-columns:1fr}
+  .adm-top{flex-direction:column;align-items:stretch}
+  .adm-tools{width:100%}
+  .adm-search{flex:1;width:auto;min-width:0}
+}
+@media(max-width:420px){
+  .kpi-grid{grid-template-columns:1fr}
+  .type-row{grid-template-columns:1fr 1fr}
+  .drw-row{grid-template-columns:1fr}
+  #toasts{left:12px;right:12px;bottom:12px}
+  .toast{max-width:none;min-width:0;width:100%}
+}
+</style>
+</head>
+<body>
+
+<div id="toasts"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-logo">HERBAL ERP <small>QR SYSTEM</small></div>
+  <button class="nav-tab active" onclick="showView('landing',this)"><span class="nav-icon">🌿</span><span class="nav-full">Landing Page</span><span class="nav-short">Landing</span></button>
+  <button class="nav-tab" onclick="showView('admin',this)"><span class="nav-icon">📊</span><span class="nav-full">Admin Dashboard</span><span class="nav-short">Admin</span></button>
+  <div class="nav-sp"></div>
+  <div class="nav-badge">ครั้งที่ 23</div>
+</nav>
+
+<!-- ══ LANDING ══ -->
+<div id="view-landing" class="view active">
+  <div class="lp-wrap">
+
+    <!-- LEFT: Brand + Benefits -->
+    <div class="lp-left">
+      <div class="lp-brand-row">
+        <div class="lp-logo">
+          <div class="lp-logo-mark">✦</div>
+          <div>HERBAL ERP <small>QR LEAD SYSTEM</small></div>
+        </div>
+        <div class="lp-mini-badge">ครั้งที่ 23</div>
+      </div>
+
+      <div class="lp-hero-copy">
+        <div class="lp-eyebrow">
+          <div class="lp-eyebrow-dot"></div>
+          แบบสำรวจผู้เยี่ยมชมบูธ
+        </div>
+        <h1 class="lp-h1">มหกรรมสมุนไพรแห่งชาติ<br><em>Thailand Herbal Expo</em></h1>
+        <p class="lp-lede">เพียงตอบคำถามเกี่ยวกับหน่วยงานและความสนใจของคุณ ทีมงานจะติดต่อกลับพร้อมข้อมูลและข้อเสนอที่ตรงกับความต้องการจริง</p>
+        <ul class="lp-bens">
+          <li><div class="lp-check">✓</div>ใช้เวลาไม่ถึงนาที ถามเฉพาะข้อมูลที่จำเป็น ไม่ต้องกรอกอะไรที่ไม่เกี่ยวข้อง</li>
+          <li><div class="lp-check">✓</div>เลือกได้เองว่าต้องการนัด Demo สอบถามข้อมูลเบื้องต้น หรือยังไม่สนใจตอนนี้</li>
+          <li><div class="lp-check">✓</div>ระบุโมดูลที่สนใจได้ เพื่อให้ทีมงานเตรียมข้อมูลและนำเสนอให้ตรงจุดกับคุณมากที่สุด</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: Form -->
+    <div class="lp-right">
+
+      <!-- Form -->
+      <div class="lp-form-box" id="form-wrap">
+        <div class="lp-form-top">
+          <div class="lp-form-kicker">Visitor Survey</div>
+          <div class="lp-time-pill">ใช้เวลาประมาณ 60 วินาที</div>
+        </div>
+
+        <h2 class="lp-form-h">ลงทะเบียนความสนใจ<br>ระบบ HERBAL ERP</h2>
+        <p class="lp-form-sub"><strong>กรอกข้อมูลสั้น ๆ</strong> เพื่อให้ทีมงานติดต่อกลับได้ตรงความต้องการ</p>
+
+        <div class="fld" id="orgtype-fld">
+          <label>ประเภทหน่วยงาน <span class="req">*</span></label>
+          <div class="org-row" role="radiogroup" aria-label="ประเภทหน่วยงาน">
+            <button type="button" class="org-btn" data-org="hospital" onclick="setOrgType('hospital')">
+              <span class="org-btn-icon">🏥</span><span class="org-btn-label">โรงพยาบาล</span>
+            </button>
+            <button type="button" class="org-btn" data-org="factory" onclick="setOrgType('factory')">
+              <span class="org-btn-icon">🏭</span><span class="org-btn-label">โรงงาน/บริษัท</span>
+            </button>
+            <button type="button" class="org-btn" data-org="individual" onclick="setOrgType('individual')">
+              <span class="org-btn-icon">👤</span><span class="org-btn-label">บุคคลทั่วไป</span>
+            </button>
+          </div>
+          <div class="ferr" id="e-orgtype">กรุณาเลือกประเภทหน่วยงาน</div>
+        </div>
+
+        <div class="field-grid" id="contact-grid">
+          <div class="fld">
+            <label>ชื่อ-นามสกุล <span class="req">*</span></label>
+            <input class="inp" type="text" id="f-name" placeholder="เช่น คุณวรพงศ์" autocomplete="name">
+            <div class="ferr" id="e-name">กรุณากรอกชื่อ</div>
+          </div>
+
+          <div class="fld">
+            <label>เบอร์โทรศัพท์ <span class="req">*</span></label>
+            <input class="inp" type="tel" id="f-tel" placeholder="08x-xxx-xxxx" oninput="fmtPhone(this)" autocomplete="tel">
+            <div class="ferr" id="e-tel">กรุณากรอกเบอร์</div>
+          </div>
+        </div>
+
+        <div class="frow" id="org-detail-row">
+          <div class="fld" id="company-fld">
+            <label id="company-label">ชื่อโรงงาน / บริษัท <span class="req">*</span></label>
+            <input class="inp" type="text" id="f-company" placeholder="ชื่อโรงงานหรือบริษัท" autocomplete="organization">
+            <div class="ferr" id="e-company">กรุณากรอกชื่อ</div>
+          </div>
+          <div class="fld" id="size-fld">
+            <label id="size-label">จำนวนพนักงาน</label>
+            <select class="inp" id="f-size">
+              <option value="">เลือกขนาดหน่วยงาน</option>
+              <option>น้อยกว่า 10 คน</option>
+              <option>10-50 คน</option>
+              <option>50-200 คน</option>
+              <option>มากกว่า 200 คน</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="fld" id="interest-fld">
+          <label>ระดับความสนใจ <span class="req">*</span></label>
+          <div class="int-row" role="radiogroup" aria-label="ระดับความสนใจ">
+            <label class="int-opt">
+              <input type="radio" name="interest" value="demo" onchange="setInterestLevel('demo')">
+              <div>
+                <div class="int-opt-title">ต้องการให้นำเสนอระบบ / สาธิตเพิ่มเติม</div>
+                <div class="int-opt-sub">สนใจนัดหมายเพื่อดูรายละเอียดหรือทดลองผลิตภัณฑ์</div>
+              </div>
+            </label>
+            <label class="int-opt">
+              <input type="radio" name="interest" value="info" onchange="setInterestLevel('info')">
+              <div>
+                <div class="int-opt-title">สอบถามข้อมูลเบื้องต้นเฉยๆ</div>
+                <div class="int-opt-sub">ขอข้อมูลทั่วไป ยังไม่ต้องการนัดหมายในตอนนี้</div>
+              </div>
+            </label>
+            <label class="int-opt">
+              <input type="radio" name="interest" value="not_interested" onchange="setInterestLevel('not_interested')">
+              <div>
+                <div class="int-opt-title">ไม่สนใจในขณะนี้</div>
+                <div class="int-opt-sub">ไม่ต้องการข้อมูลหรือการติดต่อเพิ่มเติม</div>
+              </div>
+            </label>
+          </div>
+          <div class="ferr" id="e-interest">กรุณาเลือกระดับความสนใจ</div>
+        </div>
+
+        <div class="fld" id="modules-fld">
+          <label>โมดูลที่สนใจ <small>เลือกได้หลายข้อ</small></label>
+          <label class="mod-chip mod-all">
+            <input type="checkbox" id="mod-all" onchange="toggleAllModules(this.checked)">
+            <span>สนใจทั้งหมด</span>
+          </label>
+          <div class="mod-grid">
+            <label class="mod-chip"><input type="checkbox" class="mod-cb" value="คลังสินค้า" onchange="onModuleChange()"><span>📦 คลังสินค้า</span></label>
+            <label class="mod-chip"><input type="checkbox" class="mod-cb" value="การผลิต" onchange="onModuleChange()"><span>🏭 การผลิต</span></label>
+            <label class="mod-chip"><input type="checkbox" class="mod-cb" value="คุณภาพ (QC)" onchange="onModuleChange()"><span>🧪 คุณภาพ (QC)</span></label>
+            <label class="mod-chip"><input type="checkbox" class="mod-cb" value="คุณภาพ GMP" onchange="onModuleChange()"><span>✅ คุณภาพ GMP</span></label>
+            <label class="mod-chip"><input type="checkbox" class="mod-cb" value="จัดซื้อ" onchange="onModuleChange()"><span>🛒 จัดซื้อ</span></label>
+            <label class="mod-chip"><input type="checkbox" class="mod-cb" value="ขาย" onchange="onModuleChange()"><span>💰 ขาย</span></label>
+            <label class="mod-chip"><input type="checkbox" class="mod-cb" value="บุคลากร" onchange="onModuleChange()"><span>👥 บุคลากร</span></label>
+            <label class="mod-chip"><input type="checkbox" class="mod-cb" value="บัญชี" onchange="onModuleChange()"><span>💳 บัญชี</span></label>
+          </div>
+        </div>
+
+        <div class="fld" id="date-fld" style="display:none">
+          <label>เลือกวันและช่วงเวลานัด Demo <span class="req">*</span></label>
+          <div class="cal-box">
+            <div class="cal-head">
+              <button type="button" class="cal-nav" onclick="calChangeMonth(-1)" aria-label="เดือนก่อนหน้า">‹</button>
+              <div class="cal-month" id="cal-month-label">—</div>
+              <button type="button" class="cal-nav" onclick="calChangeMonth(1)" aria-label="เดือนถัดไป">›</button>
+            </div>
+            <div class="cal-dow"><span>อา</span><span>จ</span><span>อ</span><span>พ</span><span>พฤ</span><span>ศ</span><span>ส</span></div>
+            <div class="cal-grid" id="cal-grid"></div>
+          </div>
+          <div class="slot-row" id="slot-row"></div>
+          <input type="hidden" id="f-date">
+          <div class="ferr" id="e-date">กรุณาเลือกวันและช่วงเวลาที่สะดวก</div>
+        </div>
+
+        <div class="fld" id="reason-fld" style="display:none">
+          <label>เหตุผลที่ไม่สนใจในขณะนี้ <span class="req">*</span></label>
+          <input class="inp" type="text" id="f-reason" placeholder="เช่น มีระบบอยู่แล้ว / งบประมาณไม่พร้อม / อื่นๆ">
+          <div class="ferr" id="e-reason">กรุณาระบุเหตุผลสั้นๆ</div>
+        </div>
+
+        <div class="fld" id="suggest-fld">
+          <label>ข้อเสนอแนะเพิ่มเติม <small>ไม่บังคับ</small></label>
+          <textarea class="txt-area" id="f-suggest" placeholder="เช่น อยากให้เพิ่มฟีเจอร์เชื่อมต่อกับระบบ HIS ของโรงพยาบาล"></textarea>
+        </div>
+
+        <label class="chk" id="pdpa-fld" style="margin-bottom:8px">
+          <input type="checkbox" id="f-pdpa" onchange="document.getElementById('e-pdpa').classList.remove('on')">
+          <span>ยินยอมให้เก็บและใช้ข้อมูลข้างต้นเพื่อติดต่อกลับ ตาม PDPA <span class="req">*</span></span>
+        </label>
+        <div class="ferr" id="e-pdpa" style="margin:-4px 0 14px">กรุณายินยอมตาม PDPA ก่อนส่งข้อมูล</div>
+
+        <button class="sub-btn" id="sub-btn" onclick="submitForm()" type="button">
+          <span id="sub-txt">ส่งข้อมูล →</span>
+        </button>
+        <p class="lp-note">ข้อมูลถูกใช้เพื่อให้ทีมติดต่อกลับเท่านั้น ไม่มีข้อผูกมัด</p>
+      </div>
+
+      <!-- Thank You -->
+      <div id="ty-wrap" style="display:none">
+        <div class="lp-form-box">
+          <div class="ty">
+            <div class="ty-ring">✓</div>
+            <div class="ty-h" id="ty-h">ลงทะเบียนสำเร็จแล้ว!</div>
+            <div class="ty-p" id="ty-p">ขอบคุณครับ ทีมผู้เชี่ยวชาญจะโทรกลับ<br>เพื่อยืนยันวันและเวลา Demo ภายใน 24 ชั่วโมง</div>
+            <div class="ty-acts" style="margin-top:20px">
+              <button class="ty-act-btn grn" onclick="downloadBrochure()">⬇ ดาวน์โหลด Brochure ฟรี</button>
+              <button class="ty-act-btn line" onclick="openLine()">💬 เพิ่ม LINE รับข่าวสาร GMP</button>
+              <button class="ty-act-btn ghost" onclick="resetForm()">← ลงทะเบียนรายการใหม่</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div id="section-form" style="display:none"></div>
+</div><!-- /view-landing -->
+
+<!-- ══ ADMIN DASHBOARD ══ -->
+<div id="view-admin" class="view">
+  <div class="adm">
+
+    <div class="adm-top">
+      <div>
+        <div class="adm-title">Sales Intelligence <span id="adm-time"></span></div>
+        <div class="adm-sub">งานมหกรรมสมุนไพรแห่งชาติ ครั้งที่ 23 · ระบบ HERBAL ERP</div>
+      </div>
+      <div class="adm-tools">
+        <input class="adm-search" type="text" placeholder="🔍 ค้นหา Lead..." oninput="searchLeads(this.value)">
+        <select class="adm-select" onchange="filterLeads(this.value)">
+          <option value="all">ทุก Lead</option>
+          <option value="demo">QR Demo</option>
+          <option value="brochure">QR Brochure</option>
+          <option value="direct">ติดต่อตรง</option>
+          <option value="high">Priority สูง</option>
+          <option value="org-hospital">โรงพยาบาล</option>
+          <option value="org-factory">โรงงาน/บริษัท</option>
+          <option value="org-individual">บุคคลทั่วไป</option>
+          <option value="int-demo">สนใจ Demo</option>
+          <option value="int-info">สอบถามข้อมูล</option>
+          <option value="int-not">ไม่สนใจ</option>
+        </select>
+        <button class="adm-btn ghost" onclick="exportCSV()">⬇ Export CSV</button>
+        <button class="adm-btn g" onclick="openAddModal()">+ เพิ่ม Lead</button>
+      </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-grid">
+      <div class="kpi k1">
+        <div class="kpi-lbl">Lead ทั้งหมด</div>
+        <div class="kpi-val" id="kpi-total">—</div>
+        <div class="kpi-sub">ลงทะเบียนผ่านระบบ</div>
+      </div>
+      <div class="kpi k2">
+        <div class="kpi-lbl">ต้องการสาธิต Demo</div>
+        <div class="kpi-val" id="kpi-interest">—</div>
+        <div class="kpi-sub">ระดับความสนใจ = Demo</div>
+      </div>
+      <div class="kpi k3">
+        <div class="kpi-lbl">นัดหมายแล้ว</div>
+        <div class="kpi-val" id="kpi-demo">—</div>
+        <div class="kpi-sub">สถานะ นัดแล้ว + ปิดสำเร็จ</div>
+      </div>
+      <div class="kpi k4">
+        <div class="kpi-lbl">Conversion Rate</div>
+        <div class="kpi-val" id="kpi-conv">—</div>
+        <div class="kpi-sub">Lead → นัด Demo</div>
+      </div>
+    </div>
+
+    <!-- Funnel + Source -->
+    <div class="g2">
+      <div class="panel">
+        <div class="panel-title">
+          Sales Funnel
+          <span class="ptag ptag-g">Live</span>
+        </div>
+        <div class="funnel">
+          <div class="f-row">
+            <div class="f-lbl">ลงทะเบียน</div>
+            <div class="f-track"><div class="f-bar" style="width:100%;background:#22C55E" id="f-submit"><span class="f-bar-txt">Leads</span></div></div>
+            <div class="f-cnt" id="fc-submit">—</div><div class="f-pct" id="fp-submit">100%</div>
+          </div>
+          <div class="f-drop" id="f-drop-txt1">↓ คำนวณ</div>
+          <div class="f-row">
+            <div class="f-lbl">ต้องการ Demo</div>
+            <div class="f-track"><div class="f-bar" style="width:3%;background:#38BDF8" id="f-interest"><span class="f-bar-txt">สนใจ</span></div></div>
+            <div class="f-cnt" id="fc-interest">—</div><div class="f-pct" id="fp-interest">—</div>
+          </div>
+          <div class="f-drop" id="f-drop-txt2">↓ คำนวณ</div>
+          <div class="f-row">
+            <div class="f-lbl">นัดหมายแล้ว</div>
+            <div class="f-track"><div class="f-bar" style="width:3%;background:#D97706" id="f-demo"><span class="f-bar-txt">นัดแล้ว</span></div></div>
+            <div class="f-cnt" id="fc-demo">—</div><div class="f-pct" id="fp-demo">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="panel" style="flex:1">
+          <div class="panel-title">แหล่งที่มา Lead</div>
+          <div class="src-list" id="src-list">
+            <div class="src-item">
+              <div class="src-meta"><span class="src-name">QR Demo (Banner)</span><span class="src-val" id="src-demo-val">—</span></div>
+              <div class="src-track"><div class="src-fill" id="src-demo-bar" style="background:var(--g400)"></div></div>
+            </div>
+            <div class="src-item">
+              <div class="src-meta"><span class="src-name">QR Brochure → Demo</span><span class="src-val" id="src-broc-val">—</span></div>
+              <div class="src-track"><div class="src-fill" id="src-broc-bar" style="background:#A78BFA"></div></div>
+            </div>
+            <div class="src-item">
+              <div class="src-meta"><span class="src-name">ติดต่อโดยตรง</span><span class="src-val" id="src-dir-val">—</span></div>
+              <div class="src-track"><div class="src-fill" id="src-dir-bar" style="background:#38BDF8"></div></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Org Type + Interest Level -->
+    <div class="g2">
+      <div class="panel">
+        <div class="panel-title">ประเภทหน่วยงาน</div>
+        <div class="src-list">
+          <div class="src-item">
+            <div class="src-meta"><span class="src-name">🏥 โรงพยาบาล</span><span class="src-val" id="org-hospital-val">—</span></div>
+            <div class="src-track"><div class="src-fill" id="org-hospital-bar" style="background:#A78BFA"></div></div>
+          </div>
+          <div class="src-item">
+            <div class="src-meta"><span class="src-name">🏭 โรงงาน/บริษัท</span><span class="src-val" id="org-factory-val">—</span></div>
+            <div class="src-track"><div class="src-fill" id="org-factory-bar" style="background:var(--g400)"></div></div>
+          </div>
+          <div class="src-item">
+            <div class="src-meta"><span class="src-name">👤 บุคคลทั่วไป</span><span class="src-val" id="org-individual-val">—</span></div>
+            <div class="src-track"><div class="src-fill" id="org-individual-bar" style="background:#38BDF8"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">ระดับความสนใจ</div>
+        <div class="src-list">
+          <div class="src-item">
+            <div class="src-meta"><span class="src-name">ต้องการสาธิต Demo</span><span class="src-val" id="int-demo-val">—</span></div>
+            <div class="src-track"><div class="src-fill" id="int-demo-bar" style="background:var(--g400)"></div></div>
+          </div>
+          <div class="src-item">
+            <div class="src-meta"><span class="src-name">สอบถามข้อมูล</span><span class="src-val" id="int-info-val">—</span></div>
+            <div class="src-track"><div class="src-fill" id="int-info-bar" style="background:#FBBF24"></div></div>
+          </div>
+          <div class="src-item">
+            <div class="src-meta"><span class="src-name">ไม่สนใจ</span><span class="src-val" id="int-not-val">—</span></div>
+            <div class="src-track"><div class="src-fill" id="int-not-bar" style="background:#6B7280"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modules Popularity + Upcoming Demo -->
+    <div class="g31">
+      <div class="panel">
+        <div class="panel-title">โมดูลที่สนใจยอดนิยม <span class="ptag ptag-v">8 โมดูล</span></div>
+        <div class="src-list" id="mod-pop-list"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">นัด Demo ที่จะถึง</div>
+        <div id="upcoming-list" style="display:flex;flex-direction:column;gap:8px"></div>
+      </div>
+    </div>
+
+    <!-- Lead Table -->
+    <div class="panel">
+      <div class="panel-title">
+        Lead ทั้งหมด
+        <span class="ptag ptag-g" id="lead-count-tag">0 รายการ</span>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>ชื่อ / โรงงาน</th>
+              <th>ความสนใจ</th>
+              <th>ขนาด</th>
+              <th>Priority</th>
+              <th>แหล่ง</th>
+              <th>สถานะ</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="leads-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /view-admin -->
+
+
+<!-- LEAD DRAWER -->
+<div id="drawer-overlay" onclick="closeDrawer()"></div>
+<div id="drawer">
+  <div class="drw-head">
+    <div>
+      <div class="drw-name" id="drw-name">—</div>
+      <div class="drw-co" id="drw-co">—</div>
+    </div>
+    <button class="drw-close" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="drw-body">
+    <div class="drw-sec">
+      <div class="drw-sec-title">ข้อมูลติดต่อ</div>
+      <div class="drw-row">
+        <div class="drw-field"><label>ประเภทหน่วยงาน</label><span id="drw-org">—</span></div>
+        <div class="drw-field"><label>ชื่อหน่วยงาน</label><span id="drw-company">—</span></div>
+      </div>
+      <div class="drw-row">
+        <div class="drw-field"><label>เบอร์โทร</label><span id="drw-tel">—</span></div>
+        <div class="drw-field"><label>ขนาด</label><span id="drw-size">—</span></div>
+      </div>
+      <div class="drw-field"><label>แหล่งที่มา</label><span id="drw-src">—</span></div>
+      <div class="drw-field"><label>ระดับความสนใจ</label><span id="drw-interest">—</span></div>
+      <div class="drw-field"><label>นัด Demo</label><span id="drw-demo">—</span></div>
+      <div class="drw-field" id="drw-reason-fld"><label>เหตุผลที่ไม่สนใจ</label><span id="drw-reason">—</span></div>
+      <div class="drw-field"><label>โมดูลที่สนใจ</label><span id="drw-modules">—</span></div>
+      <div class="drw-field"><label>ข้อเสนอแนะเพิ่มเติม</label><span id="drw-suggest">—</span></div>
+    </div>
+    <div class="drw-sec">
+      <div class="drw-sec-title">อัปเดตสถานะ</div>
+      <div class="st-btns">
+        <button class="st-btn" data-st="new" onclick="setLeadStatus('new')">ใหม่</button>
+        <button class="st-btn" data-st="call" onclick="setLeadStatus('call')">รอโทร</button>
+        <button class="st-btn" data-st="sched" onclick="setLeadStatus('sched')">นัดแล้ว</button>
+        <button class="st-btn" data-st="done" onclick="setLeadStatus('done')">ปิดสำเร็จ</button>
+        <button class="st-btn" data-st="cold" onclick="setLeadStatus('cold')">เย็น</button>
+      </div>
+    </div>
+    <div class="drw-sec">
+      <div class="drw-sec-title">บันทึกเพิ่มเติม</div>
+      <textarea class="note-area" id="drw-note" placeholder="บันทึกจากการโทร หรือข้อมูลเพิ่มเติม..."></textarea>
+      <button class="save-lead-btn" onclick="saveDrawer()">บันทึกการเปลี่ยนแปลง</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD LEAD MODAL -->
+<div id="modal">
+  <div class="modal-card">
+    <div class="modal-title">+ เพิ่ม Lead ด้วยตนเอง</div>
+    <div class="mfrow">
+      <div class="mfld">
+        <label>ชื่อ-นามสกุล *</label>
+        <input class="minp" type="text" id="m-name" placeholder="ชื่อของท่าน">
+      </div>
+      <div class="mfld">
+        <label>เบอร์โทรศัพท์ *</label>
+        <input class="minp" type="tel" id="m-tel" placeholder="08x-xxx-xxxx">
+      </div>
+    </div>
+    <div class="mfld">
+      <label>ประเภทหน่วยงาน</label>
+      <select class="minp" id="m-orgtype" onchange="onModalOrgChange(this.value)">
+        <option value="factory">โรงงาน/บริษัท</option>
+        <option value="hospital">โรงพยาบาล</option>
+        <option value="individual">บุคคลทั่วไป</option>
+      </select>
+    </div>
+    <div class="mfrow" id="m-org-detail-row">
+      <div class="mfld" id="m-company-fld">
+        <label id="m-company-label">ชื่อโรงงาน / บริษัท *</label>
+        <input class="minp" type="text" id="m-company" placeholder="ชื่อโรงงาน">
+      </div>
+      <div class="mfld" id="m-size-fld">
+        <label id="m-size-label">จำนวนพนักงาน</label>
+        <select class="minp" id="m-size">
+          <option value="">-- เลือก --</option>
+          <option>น้อยกว่า 10 คน</option>
+          <option>10–50 คน</option>
+          <option>50–200 คน</option>
+          <option>มากกว่า 200 คน</option>
+        </select>
+      </div>
+    </div>
+    <div class="mfrow">
+      <div class="mfld">
+        <label>แหล่งที่มา</label>
+        <select class="minp" id="m-src">
+          <option value="direct">ติดต่อโดยตรง</option>
+          <option value="demo">QR Demo</option>
+          <option value="brochure">QR Brochure</option>
+        </select>
+      </div>
+      <div class="mfld">
+        <label>ระดับความสนใจ</label>
+        <select class="minp" id="m-interest">
+          <option value="demo">ต้องการสาธิตระบบ</option>
+          <option value="info">สอบถามข้อมูล</option>
+          <option value="not_interested">ไม่สนใจ</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-acts">
+      <button class="modal-cancel" onclick="closeModal()">ยกเลิก</button>
+      <button class="modal-ok" onclick="submitManualLead()">บันทึก Lead</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ──────────────────────────────────
+   SUPABASE
+────────────────────────────────── */
+const { createClient } = supabase;
+const sb = createClient(
+  'https://ojiiqhccbacnvtfcpwnn.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9qaWlxaGNjYmFjbnZ0ZmNwd25uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4OTYxNTUsImV4cCI6MjA5ODQ3MjE1NX0.k93XUNIajd2Q_g7NDSkWP_JZ1P5JsfB6j-8rh3VWb3Y'
+);
+
+/* ──────────────────────────────────
+   STATE
+────────────────────────────────── */
+let leads = [];
+let activeLeadId = null;
+let currentFilter = 'all';
+let currentSearch = '';
+let currentOrgType = null;
+let currentInterest = null;
+const DEMO_SLOTS = ['เช้า','บ่าย'];
+let bookedSlots = {};
+let calViewDate = new Date();
+let calSelectedDate = null;
+let calSelectedTime = null;
+
+const STT_LABEL   = {new:'ใหม่',call:'รอโทร',sched:'นัดแล้ว',done:'ปิดสำเร็จ',cold:'เย็น'};
+const SCORE_LABEL = {high:'สูง',mid:'กลาง',low:'ต่ำ'};
+const SRC_LABEL   = {demo:'QR Demo',brochure:'QR Brochure',direct:'ติดต่อตรง'};
+const ORG_LABEL   = {hospital:'โรงพยาบาล',factory:'โรงงาน/บริษัท',individual:'บุคคลทั่วไป'};
+const ORG_ICON    = {hospital:'🏥',factory:'🏭',individual:'👤'};
+const INTEREST_LABEL = {demo:'ต้องการสาธิตระบบ',info:'สอบถามข้อมูล',not_interested:'ไม่สนใจ'};
+const MODULE_LIST = ['คลังสินค้า','การผลิต','คุณภาพ (QC)','คุณภาพ GMP','จัดซื้อ','ขาย','บุคลากร','บัญชี'];
+const MODULE_ICON = {'คลังสินค้า':'📦','การผลิต':'🏭','คุณภาพ (QC)':'🧪','คุณภาพ GMP':'✅','จัดซื้อ':'🛒','ขาย':'💰','บุคลากร':'👥','บัญชี':'💳'};
+const SIZE_OPTIONS = {
+  factory:  ['น้อยกว่า 10 คน','10-50 คน','50-200 คน','มากกว่า 200 คน'],
+  hospital: ['ขนาดเล็ก (10–90 เตียง)','ขนาดกลาง (90–200 เตียง)','ขนาดใหญ่ (200–1,000+ เตียงขึ้นไป)'],
+};
+const SIZE_LABEL       = {factory:'จำนวนพนักงาน', hospital:'ขนาดโรงพยาบาล'};
+const SIZE_PLACEHOLDER = {factory:'เลือกขนาดหน่วยงาน', hospital:'เลือกขนาดโรงพยาบาล'};
+
+/* ──────────────────────────────────
+   DB HELPERS
+────────────────────────────────── */
+async function dbLoadLeads() {
+  const { data, error } = await sb.from('leads').select('*').order('created_at', { ascending: false });
+  if (error) { toast('โหลด Lead ล้มเหลว: ' + error.message, 'err'); return []; }
+  return data || [];
+}
+
+async function dbInsertLead(lead) {
+  const { error } = await sb.from('leads').insert(lead);
+  if (error) {
+    if (error.code === '23505') {
+      toast('ช่วงเวลานี้เพิ่งถูกจองไปแล้ว กรุณาเลือกวันเวลาใหม่', 'err');
+    } else {
+      toast('บันทึก Lead ล้มเหลว: ' + error.message, 'err');
+    }
+    return false;
+  }
+  return true;
+}
+
+async function dbUpdateLead(id, fields) {
+  const { error } = await sb.from('leads').update(fields).eq('id', id);
+  if (error) { toast('อัปเดต Lead ล้มเหลว: ' + error.message, 'err'); return false; }
+  return true;
+}
+
+
+/* ──────────────────────────────────
+   TOAST
+────────────────────────────────── */
+function toast(msg, type = 'ok') {
+  const icons = {ok:'✓',err:'✕',info:'ℹ'};
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<span style="font-size:15px">${icons[type]||'•'}</span><span>${msg}</span>`;
+  document.getElementById('toasts').appendChild(el);
+  el.onclick = () => el.remove();
+  setTimeout(() => {
+    el.style.animation = 'tOut .25s ease forwards';
+    setTimeout(() => el.remove(), 260);
+  }, 3000);
+}
+
+/* ──────────────────────────────────
+   NAV
+────────────────────────────────── */
+function showView(name, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'admin') refreshAdmin();
+}
+
+async function refreshAdmin() {
+  leads = await dbLoadLeads();
+  updateKPIs();
+  renderLeads(leads);
+  updateSrcBars();
+  updateOrgBars();
+  updateInterestBars();
+  updateModulePop();
+  updateUpcomingDemos();
+  updateAdminTime();
+}
+
+
+/* ──────────────────────────────────
+   LANDING — FORM
+────────────────────────────────── */
+function scrollToForm() {
+  document.getElementById('section-form').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function setInterestLevel(val) {
+  currentInterest = val;
+  document.getElementById('e-interest').classList.remove('on');
+
+  const isDemo   = val === 'demo';
+  const isColdNo = val === 'not_interested';
+
+  document.getElementById('date-fld').style.display    = isDemo ? '' : 'none';
+  document.getElementById('reason-fld').style.display  = isColdNo ? '' : 'none';
+  document.getElementById('modules-fld').style.display = isColdNo ? 'none' : '';
+
+  if (!isDemo) {
+    calSelectedDate = null; calSelectedTime = null;
+    document.getElementById('f-date').value = '';
+    document.getElementById('e-date').classList.remove('on');
+  }
+  if (!isColdNo) {
+    document.getElementById('f-reason').value = '';
+    document.getElementById('e-reason').classList.remove('on');
+  } else {
+    document.querySelectorAll('.mod-cb').forEach(cb => cb.checked = false);
+    document.getElementById('mod-all').checked = false;
+  }
+
+  document.getElementById('sub-txt').textContent =
+    isDemo ? 'ยืนยันนัด Demo →' : isColdNo ? 'ส่งความคิดเห็น →' : 'ส่งข้อมูล →';
+}
+
+function toggleAllModules(checked) {
+  document.querySelectorAll('.mod-cb').forEach(cb => cb.checked = checked);
+}
+
+function onModuleChange() {
+  const boxes = document.querySelectorAll('.mod-cb');
+  document.getElementById('mod-all').checked = [...boxes].every(cb => cb.checked);
+}
+
+function setOrgType(type) {
+  currentOrgType = type;
+  document.querySelectorAll('.org-btn').forEach(b => b.classList.toggle('on', b.dataset.org === type));
+  document.getElementById('e-orgtype').classList.remove('on');
+
+  const isIndividual = type === 'individual';
+  document.getElementById('org-detail-row').style.display = isIndividual ? 'none' : '';
+
+  if (!isIndividual) {
+    document.getElementById('company-label').innerHTML =
+      (type === 'hospital' ? 'ชื่อโรงพยาบาล' : 'ชื่อโรงงาน / บริษัท') + ' <span class="req">*</span>';
+
+    const sizeType = type === 'hospital' ? 'hospital' : 'factory';
+    document.getElementById('size-label').textContent = SIZE_LABEL[sizeType];
+    document.getElementById('f-size').innerHTML =
+      `<option value="">${SIZE_PLACEHOLDER[sizeType]}</option>` +
+      SIZE_OPTIONS[sizeType].map(o => `<option>${o}</option>`).join('');
+  } else {
+    document.getElementById('f-company').classList.remove('bad');
+    document.getElementById('e-company').classList.remove('on');
+  }
+}
+
+/* ──────────────────────────────────
+   DEMO CALENDAR
+────────────────────────────────── */
+function pad2(n) { return String(n).padStart(2,'0'); }
+function dateKey(y,m,d) { return `${y}-${pad2(m+1)}-${pad2(d)}`; }
+
+async function loadBookedSlots() {
+  const { data, error } = await sb.from('leads').select('demo_date,demo_time').not('demo_date','is',null);
+  if (error) { console.error(error); return; }
+  bookedSlots = {};
+  (data||[]).forEach(r => {
+    if (!r.demo_date || !r.demo_time) return;
+    if (!bookedSlots[r.demo_date]) bookedSlots[r.demo_date] = new Set();
+    bookedSlots[r.demo_date].add(r.demo_time);
+  });
+}
+
+function renderCalendar() {
+  const grid  = document.getElementById('cal-grid');
+  const label = document.getElementById('cal-month-label');
+  if (!grid || !label) return;
+
+  const y = calViewDate.getFullYear();
+  const m = calViewDate.getMonth();
+  label.textContent = calViewDate.toLocaleDateString('th-TH', {month:'long', year:'numeric'});
+
+  const first      = new Date(y, m, 1);
+  const startDow    = first.getDay();
+  const daysInMonth = new Date(y, m+1, 0).getDate();
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  let html = '';
+  for (let i=0; i<startDow; i++) html += `<div class="cal-day empty"></div>`;
+  for (let d=1; d<=daysInMonth; d++) {
+    const dow     = new Date(y,m,d).getDay();
+    const key     = dateKey(y,m,d);
+    const dateObj = new Date(y,m,d); dateObj.setHours(0,0,0,0);
+    const isPast    = dateObj < today;
+    const isWeekend = dow === 0 || dow === 6;
+    const disabled  = isPast || isWeekend;
+    const isToday   = dateObj.getTime() === today.getTime();
+    const isSel     = key === calSelectedDate;
+    html += `<div class="cal-day${disabled?' disabled':''}${isToday?' today':''}${isSel?' on':''}"${disabled?'':` onclick="selectCalDate('${key}')"`}>${d}</div>`;
+  }
+  grid.innerHTML = html;
+}
+
+function calChangeMonth(dir) {
+  const today    = new Date();
+  const minMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  const next     = new Date(calViewDate.getFullYear(), calViewDate.getMonth()+dir, 1);
+  if (next < minMonth) return;
+  calViewDate = next;
+  renderCalendar();
+}
+
+function selectCalDate(key) {
+  calSelectedDate = key;
+  calSelectedTime = null;
+  document.getElementById('f-date').value = '';
+  renderCalendar();
+  renderSlots();
+}
+
+function renderSlots() {
+  const row = document.getElementById('slot-row');
+  if (!row) return;
+  if (!calSelectedDate) { row.classList.remove('show'); row.innerHTML = ''; return; }
+  const taken = bookedSlots[calSelectedDate] || new Set();
+  row.innerHTML = DEMO_SLOTS.map(t => {
+    const isTaken = taken.has(t);
+    const isSel   = t === calSelectedTime;
+    return `<button type="button" class="slot-btn${isTaken?' taken':''}${isSel?' on':''}"${isTaken?' disabled':` onclick="selectCalTime('${t}')"`}>${t}</button>`;
+  }).join('');
+  row.classList.add('show');
+}
+
+function selectCalTime(t) {
+  calSelectedTime = t;
+  document.getElementById('f-date').value = `${calSelectedDate} ${t}`;
+  document.getElementById('e-date').classList.remove('on');
+  renderSlots();
+}
+
+function resetCalendar() {
+  calViewDate = new Date();
+  calSelectedDate = null;
+  calSelectedTime = null;
+  const f = document.getElementById('f-date'); if (f) f.value = '';
+  renderCalendar();
+  renderSlots();
+}
+
+function fmtPhone(inp) {
+  let v = inp.value.replace(/\D/g,'');
+  if (v.length > 10) v = v.slice(0,10);
+  if (v.length >= 7) v = v.slice(0,3) + '-' + v.slice(3,6) + '-' + v.slice(6);
+  else if (v.length >= 4) v = v.slice(0,3) + '-' + v.slice(3);
+  inp.value = v;
+}
+
+function validateField(id, errId, val) {
+  const bad = !val.trim();
+  document.getElementById(id).classList.toggle('bad', bad);
+  document.getElementById(errId).classList.toggle('on', bad);
+  return !bad;
+}
+
+async function submitForm() {
+  const name    = document.getElementById('f-name').value;
+  const company = document.getElementById('f-company').value;
+  const tel     = document.getElementById('f-tel').value;
+  const reason  = document.getElementById('f-reason').value;
+  const isIndividual     = currentOrgType === 'individual';
+  const isDemoBooking    = currentInterest === 'demo';
+  const isNotInterested  = currentInterest === 'not_interested';
+
+  const okOrg = !!currentOrgType;
+  document.getElementById('e-orgtype').classList.toggle('on', !okOrg);
+  const ok1 = validateField('f-name','e-name',name);
+  const ok2 = isIndividual ? true : validateField('f-company','e-company',company);
+  const ok3 = validateField('f-tel','e-tel',tel);
+  const okInterest = !!currentInterest;
+  document.getElementById('e-interest').classList.toggle('on', !okInterest);
+  const ok4 = isDemoBooking ? !!(calSelectedDate && calSelectedTime) : true;
+  document.getElementById('e-date').classList.toggle('on', isDemoBooking && !ok4);
+  const ok5 = isNotInterested ? !!reason.trim() : true;
+  document.getElementById('e-reason').classList.toggle('on', isNotInterested && !ok5);
+  const okPdpa = document.getElementById('f-pdpa').checked;
+  document.getElementById('e-pdpa').classList.toggle('on', !okPdpa);
+
+  if (!ok1||!ok2||!ok3||!okOrg||!ok4||!ok5||!okPdpa||!okInterest) { toast('กรุณากรอกข้อมูลที่จำเป็น','err'); return; }
+
+  const btn = document.getElementById('sub-btn');
+  btn.classList.add('loading');
+  document.getElementById('sub-txt').textContent = 'กำลังบันทึก...';
+
+  const score  = currentInterest === 'demo' ? 'high' : currentInterest === 'info' ? 'mid' : 'low';
+  const params = new URLSearchParams(window.location.search);
+  const srcParam = params.get('src') || '';
+  const modules  = [...document.querySelectorAll('.mod-cb:checked')].map(c => c.value);
+
+  const lead = {
+    id: 'L' + String(Date.now()).slice(-6),
+    name: name.trim(),
+    company: isIndividual ? '—' : company.trim(),
+    tel: tel.trim(),
+    size: isIndividual ? '—' : (document.getElementById('f-size').value || '—'),
+    org_type: currentOrgType,
+    interest_level: currentInterest,
+    demo_date: isDemoBooking ? calSelectedDate : null,
+    demo_time: isDemoBooking ? calSelectedTime : null,
+    not_interested_reason: isNotInterested ? reason.trim() : null,
+    modules,
+    suggestion: document.getElementById('f-suggest').value.trim() || null,
+    pdpa_consent: true,
+    src: srcParam.includes('brochure') ? 'brochure' : srcParam.includes('demo') ? 'demo' : 'direct',
+    status: 'new',
+    score,
+    note: '',
+  };
+
+  const ok = await dbInsertLead(lead);
+  btn.classList.remove('loading');
+  if (!ok) {
+    document.getElementById('sub-txt').textContent =
+      isDemoBooking ? 'ยืนยันนัด Demo →' : isNotInterested ? 'ส่งความคิดเห็น →' : 'ส่งข้อมูล →';
+    if (isDemoBooking) { await loadBookedSlots(); renderSlots(); }
+    return;
+  }
+
+  if (isDemoBooking && calSelectedDate && calSelectedTime) {
+    if (!bookedSlots[calSelectedDate]) bookedSlots[calSelectedDate] = new Set();
+    bookedSlots[calSelectedDate].add(calSelectedTime);
+  }
+
+  leads.unshift(lead);
+  document.getElementById('form-wrap').style.display = 'none';
+  document.getElementById('ty-wrap').style.display   = 'block';
+  document.getElementById('ty-wrap').scrollIntoView({behavior:'smooth'});
+
+  if (currentInterest === 'info') {
+    document.getElementById('ty-h').textContent = 'รับข้อมูลสำเร็จ!';
+    document.getElementById('ty-p').innerHTML   = 'ขอบคุณครับ กด "ดาวน์โหลด" เพื่อรับไฟล์ PDF ฟรีได้เลย';
+  } else if (isNotInterested) {
+    document.getElementById('ty-h').textContent = 'ขอบคุณสำหรับความคิดเห็น';
+    document.getElementById('ty-p').innerHTML   = 'เราจะนำข้อมูลนี้ไปพัฒนาปรับปรุงบริการต่อไป';
+  }
+  toast('บันทึกข้อมูลสำเร็จ!');
+}
+
+function resetForm() {
+  document.getElementById('form-wrap').style.display = '';
+  document.getElementById('ty-wrap').style.display   = 'none';
+  document.getElementById('sub-btn').classList.remove('loading');
+  ['f-name','f-company','f-tel','f-reason','f-suggest'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  const sizeEl = document.getElementById('f-size'); if (sizeEl) sizeEl.value = '';
+  document.getElementById('f-pdpa').checked = false;
+  document.querySelectorAll('.inp.bad').forEach(el => el.classList.remove('bad'));
+  document.querySelectorAll('.ferr.on').forEach(el => el.classList.remove('on'));
+  document.querySelectorAll('input[name=interest]').forEach(r => r.checked = false);
+  document.querySelectorAll('.mod-cb').forEach(cb => cb.checked = false);
+  document.getElementById('mod-all').checked = false;
+  currentOrgType = null;
+  currentInterest = null;
+  document.querySelectorAll('.org-btn').forEach(b => b.classList.remove('on'));
+  document.getElementById('org-detail-row').style.display = '';
+  document.getElementById('company-label').innerHTML = 'ชื่อโรงงาน / บริษัท <span class="req">*</span>';
+  document.getElementById('size-label').textContent = SIZE_LABEL.factory;
+  document.getElementById('f-size').innerHTML =
+    `<option value="">${SIZE_PLACEHOLDER.factory}</option>` +
+    SIZE_OPTIONS.factory.map(o => `<option>${o}</option>`).join('');
+  document.getElementById('date-fld').style.display    = 'none';
+  document.getElementById('reason-fld').style.display  = 'none';
+  document.getElementById('modules-fld').style.display = '';
+  document.getElementById('sub-txt').textContent = 'ส่งข้อมูล →';
+  resetCalendar();
+}
+
+function downloadBrochure() {
+  toast('เปิดดาวน์โหลด Brochure... (เชื่อมต่อ Google Drive ในระบบจริง)','info');
+}
+
+function openLine() {
+  toast('เปิด LINE @bms-erp...(เชื่อมต่อ LINE OA ในระบบจริง)','info');
+}
+
+/* ──────────────────────────────────
+   ADMIN
+────────────────────────────────── */
+function updateAdminTime() {
+  const el = document.getElementById('adm-time');
+  if (el) el.textContent = `อัปเดต: ${new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})} น.`;
+}
+
+function updateKPIs() {
+  const total       = leads.length;
+  const interested  = leads.filter(l => l.interest_level === 'demo').length;
+  const scheduled   = leads.filter(l => l.status === 'sched' || l.status === 'done').length;
+  const convInt     = total > 0 ? Math.round(interested / total * 100) : 0;
+  const convSched   = total > 0 ? Math.round(scheduled / total * 100) : 0;
+  const convClose   = interested > 0 ? Math.round(scheduled / interested * 100) : 0;
+
+  document.getElementById('kpi-total').textContent    = total || '—';
+  document.getElementById('kpi-interest').textContent = interested || '—';
+  document.getElementById('kpi-demo').textContent     = scheduled || '—';
+  document.getElementById('kpi-conv').textContent     = total > 0 ? convSched + '%' : '—';
+
+  document.getElementById('fc-submit').textContent = total;
+  document.getElementById('fp-submit').textContent = total > 0 ? '100%' : '—';
+  document.getElementById('f-submit').style.width  = '100%';
+
+  document.getElementById('fc-interest').textContent = interested;
+  document.getElementById('fp-interest').textContent = total > 0 ? convInt + '%' : '—';
+  document.getElementById('f-interest').style.width  = total > 0 ? Math.max(convInt, 3) + '%' : '3%';
+
+  document.getElementById('fc-demo').textContent   = scheduled;
+  document.getElementById('fp-demo').textContent   = total > 0 ? convSched + '%' : '—';
+  document.getElementById('f-demo').style.width    = total > 0 ? Math.max(convSched, 3) + '%' : '3%';
+
+  const drop1 = document.getElementById('f-drop-txt1');
+  if (drop1) drop1.textContent = total > 0 ? `↓ ${convInt}% ต้องการสาธิต Demo` : '↓ ยังไม่มีข้อมูล';
+  const drop2 = document.getElementById('f-drop-txt2');
+  if (drop2) drop2.textContent = interested > 0 ? `↓ ${convClose}% ปิดนัดหมายได้` : '↓ รอข้อมูล';
+}
+
+function updateOrgBars() {
+  const hospC = leads.filter(l=>l.org_type==='hospital').length;
+  const factC = leads.filter(l=>l.org_type==='factory').length;
+  const indC  = leads.filter(l=>l.org_type==='individual').length;
+  const max = Math.max(hospC,factC,indC,1);
+  document.getElementById('org-hospital-val').textContent = hospC;
+  document.getElementById('org-factory-val').textContent  = factC;
+  document.getElementById('org-individual-val').textContent = indC;
+  document.getElementById('org-hospital-bar').style.width   = (hospC/max*100)+'%';
+  document.getElementById('org-factory-bar').style.width    = (factC/max*100)+'%';
+  document.getElementById('org-individual-bar').style.width = (indC/max*100)+'%';
+}
+
+function updateInterestBars() {
+  const demoC = leads.filter(l=>l.interest_level==='demo').length;
+  const infoC = leads.filter(l=>l.interest_level==='info').length;
+  const notC  = leads.filter(l=>l.interest_level==='not_interested').length;
+  const max = Math.max(demoC,infoC,notC,1);
+  document.getElementById('int-demo-val').textContent = demoC;
+  document.getElementById('int-info-val').textContent = infoC;
+  document.getElementById('int-not-val').textContent  = notC;
+  document.getElementById('int-demo-bar').style.width = (demoC/max*100)+'%';
+  document.getElementById('int-info-bar').style.width = (infoC/max*100)+'%';
+  document.getElementById('int-not-bar').style.width  = (notC/max*100)+'%';
+}
+
+function updateModulePop() {
+  const counts = {};
+  MODULE_LIST.forEach(m => counts[m] = 0);
+  leads.forEach(l => (l.modules||[]).forEach(m => { if (counts[m] !== undefined) counts[m]++; }));
+  const max = Math.max(...MODULE_LIST.map(m => counts[m]), 1);
+  const wrap = document.getElementById('mod-pop-list');
+  wrap.innerHTML = MODULE_LIST.map(m => `
+    <div class="src-item">
+      <div class="src-meta"><span class="src-name">${MODULE_ICON[m]} ${m}</span><span class="src-val">${counts[m]}</span></div>
+      <div class="src-track"><div class="src-fill" style="background:var(--t400);width:${(counts[m]/max*100)}%"></div></div>
+    </div>
+  `).join('');
+}
+
+function updateUpcomingDemos() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const upcoming = leads
+    .filter(l => l.demo_date && new Date(l.demo_date) >= today)
+    .sort((a,b) => a.demo_date.localeCompare(b.demo_date) || (a.demo_time||'').localeCompare(b.demo_time||''));
+  const wrap = document.getElementById('upcoming-list');
+  if (!upcoming.length) {
+    wrap.innerHTML = `<div class="upc-empty">ยังไม่มีนัด Demo ที่จะถึง</div>`;
+    return;
+  }
+  wrap.innerHTML = upcoming.slice(0,8).map(l => `
+    <div class="upc-item" onclick="openDrawer('${l.id}')">
+      <div class="upc-date">${l.demo_date}<span>${l.demo_time||''}</span></div>
+      <div>
+        <div class="upc-name">${esc(l.name)}</div>
+        <div class="upc-co">${esc(l.org_type==='individual' ? ORG_LABEL.individual : l.company)}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function updateSrcBars() {
+  const demoC = leads.filter(l=>l.src==='demo').length;
+  const brocC = leads.filter(l=>l.src==='brochure').length;
+  const dirC  = leads.filter(l=>l.src==='direct').length;
+  const max = Math.max(demoC,brocC,dirC,1);
+  document.getElementById('src-demo-val').textContent = demoC;
+  document.getElementById('src-broc-val').textContent = brocC;
+  document.getElementById('src-dir-val').textContent  = dirC;
+  document.getElementById('src-demo-bar').style.width = (demoC/max*100)+'%';
+  document.getElementById('src-broc-bar').style.width = (brocC/max*100)+'%';
+  document.getElementById('src-dir-bar').style.width  = (dirC/max*100)+'%';
+}
+
+function filterLeads(val) { currentFilter = val; applyFilter(); }
+function searchLeads(q)   { currentSearch = q.toLowerCase(); applyFilter(); }
+
+function applyFilter() {
+  let data = [...leads];
+  if (currentFilter === 'demo')     data = data.filter(l => l.src === 'demo');
+  if (currentFilter === 'brochure') data = data.filter(l => l.src === 'brochure');
+  if (currentFilter === 'direct')   data = data.filter(l => l.src === 'direct');
+  if (currentFilter === 'high')     data = data.filter(l => l.score === 'high');
+  if (currentFilter === 'org-hospital')   data = data.filter(l => l.org_type === 'hospital');
+  if (currentFilter === 'org-factory')    data = data.filter(l => l.org_type === 'factory');
+  if (currentFilter === 'org-individual') data = data.filter(l => l.org_type === 'individual');
+  if (currentFilter === 'int-demo') data = data.filter(l => l.interest_level === 'demo');
+  if (currentFilter === 'int-info') data = data.filter(l => l.interest_level === 'info');
+  if (currentFilter === 'int-not')  data = data.filter(l => l.interest_level === 'not_interested');
+  if (currentSearch) data = data.filter(l =>
+    l.name.toLowerCase().includes(currentSearch) ||
+    l.company.toLowerCase().includes(currentSearch) ||
+    l.tel.includes(currentSearch)
+  );
+  renderLeads(data);
+}
+
+function renderLeads(data) {
+  const tbody = document.getElementById('leads-tbody');
+  document.getElementById('lead-count-tag').textContent = data.length + ' รายการ';
+  if (!data.length) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--dt4);padding:24px">ไม่พบ Lead ที่ตรงกัน</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = data.map(l => `
+    <tr onclick="openDrawer('${l.id}')">
+      <td>
+        <div class="td-name">${esc(l.name)}</div>
+        <div class="td-co">${l.org_type ? (ORG_ICON[l.org_type]||'')+' ' : ''}${esc(l.org_type === 'individual' ? ORG_LABEL.individual : l.company)}</div>
+      </td>
+      <td style="max-width:110px;white-space:normal;font-size:11px;color:var(--dt3)">${INTEREST_LABEL[l.interest_level]||l.interest_level||'—'}</td>
+      <td style="font-size:11px;color:var(--dt3)">${l.size||'—'}</td>
+      <td><span class="pill pill-${l.score}">${SCORE_LABEL[l.score]||l.score}</span></td>
+      <td><span class="srcp srcp-${l.src}">${SRC_LABEL[l.src]||l.src}</span></td>
+      <td><span class="stt stt-${l.status}">${STT_LABEL[l.status]||l.status}</span></td>
+      <td onclick="event.stopPropagation()">
+        ${l.status !== 'done' && l.status !== 'sched'
+          ? `<button class="row-btn call" onclick="quickCall('${l.id}')">โทร</button>`
+          : `<button class="row-btn" onclick="openDrawer('${l.id}')">รายละเอียด</button>`}
+      </td>
+    </tr>
+  `).join('');
+}
+
+async function quickCall(id) {
+  const l = leads.find(x => x.id === id);
+  if (!l) return;
+  const ok = await dbUpdateLead(id, { status: 'call' });
+  if (!ok) return;
+  l.status = 'call';
+  applyFilter();
+  updateKPIs();
+  toast(`อัปเดต: ${l.name} → รอโทร`);
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ──────────────────────────────────
+   LEAD DRAWER
+────────────────────────────────── */
+function openDrawer(id) {
+  const l = leads.find(x => x.id === id);
+  if (!l) return;
+  activeLeadId = id;
+  document.getElementById('drw-name').textContent   = l.name;
+  document.getElementById('drw-co').textContent     = l.org_type === 'individual' ? ORG_LABEL.individual : l.company;
+  document.getElementById('drw-org').textContent    = ORG_LABEL[l.org_type] || '—';
+  document.getElementById('drw-company').textContent = l.org_type === 'individual' ? '—' : (l.company || '—');
+  document.getElementById('drw-tel').textContent    = l.tel || '—';
+  document.getElementById('drw-size').textContent   = l.size || '—';
+  document.getElementById('drw-src').textContent    = SRC_LABEL[l.src] || l.src;
+  document.getElementById('drw-interest').textContent = INTEREST_LABEL[l.interest_level] || l.interest_level || '—';
+  document.getElementById('drw-demo').textContent   = (l.demo_date && l.demo_time) ? `${l.demo_date} ช่วง${l.demo_time}` : '—';
+  document.getElementById('drw-reason-fld').style.display = l.interest_level === 'not_interested' ? '' : 'none';
+  document.getElementById('drw-reason').textContent  = l.not_interested_reason || '—';
+  document.getElementById('drw-modules').textContent = (l.modules||[]).join(', ') || '—';
+  document.getElementById('drw-suggest').textContent = l.suggestion || '—';
+  document.getElementById('drw-note').value         = l.note || '';
+  document.querySelectorAll('.st-btn').forEach(btn => {
+    btn.classList.toggle('on', btn.dataset.st === l.status);
+  });
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawer-overlay').classList.add('on');
+}
+
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawer-overlay').classList.remove('on');
+  activeLeadId = null;
+}
+
+function setLeadStatus(st) {
+  document.querySelectorAll('.st-btn').forEach(btn => {
+    btn.classList.toggle('on', btn.dataset.st === st);
+  });
+}
+
+async function saveDrawer() {
+  if (!activeLeadId) return;
+  const l = leads.find(x => x.id === activeLeadId);
+  if (!l) return;
+  const activeBtn = document.querySelector('.st-btn.on');
+  const newStatus = activeBtn ? activeBtn.dataset.st : l.status;
+  const newNote   = document.getElementById('drw-note').value;
+
+  const ok = await dbUpdateLead(activeLeadId, { status: newStatus, note: newNote });
+  if (!ok) return;
+  l.status = newStatus;
+  l.note   = newNote;
+  applyFilter();
+  updateKPIs();
+  toast('บันทึกสำเร็จ');
+  closeDrawer();
+}
+
+/* ──────────────────────────────────
+   ADD LEAD MODAL
+────────────────────────────────── */
+function openAddModal() {
+  document.getElementById('modal').classList.add('open');
+  onModalOrgChange(document.getElementById('m-orgtype').value);
+}
+
+function onModalOrgChange(type) {
+  const isIndividual = type === 'individual';
+  document.getElementById('m-org-detail-row').style.display = isIndividual ? 'none' : '';
+  if (!isIndividual) {
+    document.getElementById('m-company-label').textContent =
+      (type === 'hospital' ? 'ชื่อโรงพยาบาล *' : 'ชื่อโรงงาน / บริษัท *');
+
+    const sizeType = type === 'hospital' ? 'hospital' : 'factory';
+    document.getElementById('m-size-label').textContent = SIZE_LABEL[sizeType];
+    document.getElementById('m-size').innerHTML =
+      `<option value="">-- เลือก --</option>` +
+      SIZE_OPTIONS[sizeType].map(o => `<option>${o}</option>`).join('');
+  }
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  ['m-name','m-company','m-tel'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('m-orgtype').value = 'factory';
+  onModalOrgChange('factory');
+}
+
+async function submitManualLead() {
+  const name     = document.getElementById('m-name').value.trim();
+  const orgType  = document.getElementById('m-orgtype').value;
+  const isIndividual = orgType === 'individual';
+  const company  = isIndividual ? '—' : document.getElementById('m-company').value.trim();
+  const tel      = document.getElementById('m-tel').value.trim();
+  if (!name || !tel || (!isIndividual && !company)) { toast('กรุณากรอกข้อมูลที่จำเป็น','err'); return; }
+
+  const interest = document.getElementById('m-interest').value;
+  const l = {
+    id: 'M' + String(Date.now()).slice(-6),
+    name, company, tel,
+    org_type: orgType,
+    size: isIndividual ? '—' : (document.getElementById('m-size').value || '—'),
+    interest_level: interest,
+    src:  document.getElementById('m-src').value,
+    status: 'new',
+    score: interest === 'demo' ? 'high' : interest === 'info' ? 'mid' : 'low',
+    note: '',
+  };
+
+  const ok = await dbInsertLead(l);
+  if (!ok) return;
+  leads.unshift(l);
+  applyFilter();
+  updateKPIs();
+  updateSrcBars();
+  updateOrgBars();
+  updateInterestBars();
+  updateModulePop();
+  updateUpcomingDemos();
+  closeModal();
+  toast('เพิ่ม Lead สำเร็จ: ' + name);
+}
+
+/* ──────────────────────────────────
+   EXPORT CSV
+────────────────────────────────── */
+function exportCSV() {
+  const hdr  = ['ID','วันเวลาลงทะเบียน','ชื่อ','ประเภทหน่วยงาน','โรงงาน/บริษัท','เบอร์','ขนาด','นัด Demo','ระดับความสนใจ','เหตุผลที่ไม่สนใจ','โมดูลที่สนใจ','ข้อเสนอแนะเพิ่มเติม','แหล่ง','สถานะ','Priority','หมายเหตุ'];
+  const rows = leads.map(l => [
+    l.id, l.created_at ? new Date(l.created_at).toLocaleString('th-TH') : '—',
+    l.name, ORG_LABEL[l.org_type]||l.org_type||'—', l.company, l.tel, l.size,
+    (l.demo_date && l.demo_time) ? `${l.demo_date} ${l.demo_time}` : '—',
+    INTEREST_LABEL[l.interest_level]||l.interest_level||'—', l.not_interested_reason||'',
+    (l.modules||[]).join(' | '), l.suggestion||'',
+    SRC_LABEL[l.src]||l.src,
+    STT_LABEL[l.status]||l.status, SCORE_LABEL[l.score]||l.score, l.note
+  ]);
+  const csv = [hdr, ...rows].map(r => r.map(c => `"${String(c||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['﻿' + csv], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `ERP_Leads_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  toast('Export CSV สำเร็จ (' + leads.length + ' รายการ)');
+}
+
+
+/* ──────────────────────────────────
+   INIT
+────────────────────────────────── */
+(async function init() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('src')) {
+    document.getElementById('section-form').scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  await loadBookedSlots();
+  renderCalendar();
+  renderSlots();
+  setInterval(updateAdminTime, 60000);
+})();
+</script>
+</body>
+</html>
