@@ -1437,6 +1437,31 @@ body.theme-light .t-num{color:rgba(0,0,0,.6)}
         <div class="voc-list" id="voc-list"></div>
       </div>
     </div>
+
+    <!-- Daily Registration Summary -->
+    <div class="panel" style="margin-bottom:16px">
+      <div class="panel-title">
+        สรุปยอดลงทะเบียนรายวัน
+        <span class="ptag ptag-g" id="daily-summary-tag">0 วัน</span>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>วันที่ลงทะเบียน</th>
+              <th>ลงทะเบียน</th>
+              <th>🏥 รพ.</th>
+              <th>🏭 โรงงาน</th>
+              <th>👤 บุคคล</th>
+              <th>✅ Demo</th>
+              <th>ℹ️ สอบถาม</th>
+              <th>⛔ ไม่สนใจ</th>
+            </tr>
+          </thead>
+          <tbody id="daily-summary-body"></tbody>
+        </table>
+      </div>
+    </div>
     </div><!-- /admin-tab-dashboard -->
 
     <div id="admin-tab-raw" style="display:none">
@@ -1665,6 +1690,7 @@ function refreshAdminView() {
   updateUpcomingDemos();
   updateTrend();
   updateVoC();
+  updateDailySummary();
 }
 
 function subscribeRealtimeLeads() {
@@ -1725,6 +1751,7 @@ async function refreshAdmin() {
   updateUpcomingDemos();
   updateTrend();
   updateVoC();
+  updateDailySummary();
   updateAdminTime();
 }
 
@@ -2235,6 +2262,45 @@ function updateTrend() {
         <div class="t-track"><div class="t-bar" style="width:${pct}%;background:var(--g400)">${counts[i]>0?`<span class="t-num">${counts[i]}</span>`:''}</div></div>
         <div class="t-total">${counts[i]}</div>
       </div>`;
+  }).join('');
+}
+
+const WEEKDAY_TH = ['อา','จ','อ','พ','พฤ','ศ','ส'];
+function updateDailySummary() {
+  const groups = {};
+  leads.forEach(l => {
+    if (!l.created_at) return;
+    const key = dateKeyLocal(new Date(l.created_at));
+    if (!groups[key]) groups[key] = { total:0, hospital:0, factory:0, individual:0, demo:0, info:0, not_interested:0 };
+    const g = groups[key];
+    g.total++;
+    if (l.org_type in g) g[l.org_type]++;
+    if (l.interest_level in g) g[l.interest_level]++;
+  });
+  const keys = Object.keys(groups).sort((a,b) => b.localeCompare(a));
+  const tag = document.getElementById('daily-summary-tag');
+  if (tag) tag.textContent = `${keys.length} วัน`;
+  const wrap = document.getElementById('daily-summary-body');
+  if (!wrap) return;
+  if (!keys.length) {
+    wrap.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--dt4);padding:16px">ยังไม่มีข้อมูล</td></tr>`;
+    return;
+  }
+  wrap.innerHTML = keys.map(key => {
+    const g = groups[key];
+    const d = new Date(key + 'T00:00:00');
+    const label = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} (${WEEKDAY_TH[d.getDay()]})`;
+    return `
+      <tr>
+        <td class="td-name">${label}</td>
+        <td>${g.total}</td>
+        <td>${g.hospital}</td>
+        <td>${g.factory}</td>
+        <td>${g.individual}</td>
+        <td>${g.demo}</td>
+        <td>${g.info}</td>
+        <td>${g.not_interested}</td>
+      </tr>`;
   }).join('');
 }
 
